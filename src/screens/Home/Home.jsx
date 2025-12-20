@@ -1,5 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import bgImg from "../../assets/player/apaisada_escritor.jpeg"; // Importamos la imagen de fondo
+import tanti1 from "../../assets/images/tanti.jpeg"; // Importamos la imagen de fondo
+import nostalgias from "../../assets/libros/nostalgias.jpg"; // Importamos la imagen de fondo
+import silencio from "../../assets/libros/silencio.jpeg"; // Importamos la imagen de fondo
+import caja from "../../assets/libros/cajadeltiempo.png"; // Importamos la imagen de fondo
 import "./homeStyles.css";
 
 export default function Home() {
@@ -135,7 +139,11 @@ export default function Home() {
             <div className="order-1 md:order-2 flex justify-center">
               {/* Placeholder para foto en ambiente real */}
               <div className="w-full h-80 bg-[#e0e0e0] rounded-lg flex items-center justify-center text-gray-500 italic border border-gray-300 shadow-inner">
-                Foto en Tanti / Sierras
+                <img
+                  src={tanti1}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
           </section>
@@ -152,9 +160,13 @@ export default function Home() {
 
             <div className="grid md:grid-cols-3 gap-8">
               {/* Libro 1 */}
-              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037]">
-                <div className="h-64 bg-black/40 mb-4 flex items-center justify-center text-gray-400">
-                  Portada Libro
+              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037] flex flex-col">
+                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
+                  <img
+                    src={nostalgias}
+                    alt="Nostalgias"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <h4 className={`text-2xl mb-2 ${cursiveFont}`}>Nostalgias</h4>
                 <p className="text-sm text-gray-300 mb-4">
@@ -165,9 +177,13 @@ export default function Home() {
                 </button>
               </div>
               {/* Libro 2 */}
-              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037]">
-                <div className="h-64 bg-black/40 mb-4 flex items-center justify-center text-gray-400">
-                  Portada Libro
+              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037] flex flex-col">
+                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
+                  <img
+                    src={caja}
+                    alt="La caja de los recuerdos"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <h4 className={`text-2xl mb-2 ${cursiveFont}`}>
                   La caja de los recuerdos
@@ -180,15 +196,19 @@ export default function Home() {
                 </button>
               </div>
               {/* Libro 3 (Preventa) */}
-              <div className="bg-[#1e3a8a] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 relative overflow-hidden">
+              <div className="bg-[#1e3a8a] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 relative overflow-hidden flex flex-col">
                 <div className="absolute top-0 right-0 bg-yellow-600 text-xs font-bold px-3 py-1">
                   PRÓXIMAMENTE
                 </div>
-                <div className="h-64 bg-black/40 mb-4 flex items-center justify-center text-gray-400">
-                  Portada Terror
+                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
+                  <img
+                    src={silencio}
+                    alt="Los que habitan el silencio"
+                    className="h-full w-full object-contain"
+                  />
                 </div>
                 <h4 className={`text-2xl mb-2 ${cursiveFont}`}>
-                  Novela de Terror
+                  Los que habitan el silencio
                 </h4>
                 <p className="text-sm text-gray-300 mb-4">
                   El miedo acecha en lo cotidiano.
@@ -219,8 +239,6 @@ export default function Home() {
                 Suscribirme
               </button>
             </div>
-
-  
           </section>
         </div>
       </scroll-container>
