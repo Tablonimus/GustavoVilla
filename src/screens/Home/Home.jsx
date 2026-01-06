@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import bgImg from "../../assets/player/apaisada_escritor.jpeg"; 
-import tanti1 from "../../assets/images/tanti.jpeg"; 
+import bgImg from "../../assets/player/apaisada_escritor.jpeg";
+import tanti1 from "../../assets/images/tanti.jpeg";
 import "./homeStyles.css";
 
 export default function Home() {
@@ -73,7 +73,10 @@ export default function Home() {
   const scroll = (direction) => {
     if (scrollRef.current) {
       const { current } = scrollRef;
-      const scrollAmount = current.clientWidth < 768 ? current.clientWidth : current.clientWidth / 3;
+      const scrollAmount =
+        current.clientWidth < 768
+          ? current.clientWidth
+          : current.clientWidth / 3;
       current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -117,12 +120,16 @@ export default function Home() {
               “Historias que unen memoria, <br /> identidad y emoción.”
             </p>
             <div className="flex gap-6 justify-start">
-              <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
-                Conocé mis libros
-              </button>
-              <button className="border border-[#774936] text-[#774936] px-8 py-3 rounded-sm hover:bg-[#774936] hover:text-white transition uppercase text-sm tracking-wider">
-                Contacto
-              </button>
+              <Link to={"/libros"}>
+                <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
+                  Conocé mis libros
+                </button>
+              </Link>
+              <Link to={"/contacto"}>
+                <button className="border border-[#774936] text-[#774936] px-8 py-3 rounded-sm hover:bg-[#774936] hover:text-white transition uppercase text-sm tracking-wider">
+                  Contacto
+                </button>
+              </Link>
             </div>
           </div>
         </div>

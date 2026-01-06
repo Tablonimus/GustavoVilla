@@ -1,6 +1,7 @@
 import React from "react";
 import portraitImg from "../../assets/player/frente_escritor.jpeg";
 import landscapeImg from "../../assets/player/apaisada_escritor.jpeg";
+import diplomaImg from "../../assets/images/diploma_2.jpeg";
 
 export default function Bio() {
   // Mismas fuentes que en Home.jsx para consistencia
@@ -89,6 +90,31 @@ export default function Bio() {
             </p>
             <p>
               También trabaja en una obra teatral breve de ciencia ficción y drama, basada en un sueño que mezcla lo poético y lo distópico.
+            </p>
+          </div>
+        </div>
+
+        {/* --- SECCIÓN 4: RECONOCIMIENTO LEGISLATIVO --- */}
+        <div className="mb-20 mt-10">
+          <div className="flex flex-col items-center text-center mb-10">
+            <h3 className={`text-3xl md:text-4xl text-[#1e3a8a] mb-4 ${cursiveFont}`}>
+              Reconocimiento Institucional
+            </h3>
+            <div className="w-16 h-1 bg-[#774936]"></div>
+          </div>
+
+          <div className="relative max-w-2xl mx-auto bg-white p-6 shadow-2xl border border-gray-200 transform hover:-translate-y-1 transition duration-500">
+            {/* Detalle decorativo superior */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#1e3a8a] via-[#774936] to-[#1e3a8a]"></div>
+            
+            <img 
+              src={diplomaImg} 
+              alt="Diploma Legislatura de Córdoba" 
+              className="w-64 h-auto shadow-inner block mx-auto object-cover"
+            />
+            
+            <p className={`mt-6 text-center text-gray-600 text-lg italic ${bodyFont}`}>
+              Beneplácito otorgado por la Legislatura de la Provincia de Córdoba en reconocimiento a su labor cultural y educativa.
             </p>
           </div>
         </div>
