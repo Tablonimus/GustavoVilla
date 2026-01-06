@@ -2,7 +2,7 @@
     {
         "id": 1,
         "title": "Nostalgias",
-        "image": "/images/nostalgias.png",
+        "image": "/images/nostalgias.jpg",
         "description": "Una colección de relatos sobre el tiempo y el recuerdo.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false
@@ -10,7 +10,7 @@
     {
         "id": 2,
         "title": "La caja de los recuerdos",
-        "image": "/images/caja.png",
+        "image": "/images/cajadeltiempo.png",
         "description": "Secretos familiares que salen a la luz.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false

@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
-import bgImg from "../../assets/player/apaisada_escritor.jpeg"; // Importamos la imagen de fondo
-import tanti1 from "../../assets/images/tanti.jpeg"; // Importamos la imagen de fondo
-import nostalgias from "../../assets/libros/nostalgias.jpg"; // Importamos la imagen de fondo
-import silencio from "../../assets/libros/silencio.jpeg"; // Importamos la imagen de fondo
-import caja from "../../assets/libros/cajadeltiempo.png"; // Importamos la imagen de fondo
+import axios from "axios";
+import bgImg from "../../assets/player/apaisada_escritor.jpeg"; 
+import tanti1 from "../../assets/images/tanti.jpeg"; 
 import "./homeStyles.css";
 
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [books, setBooks] = useState([]);
   const heroRef = useRef(null);
   const nameRef = useRef(null);
+  const scrollRef = useRef(null);
 
   // --- Pre-cargador de imágenes críticas ---
   useEffect(() => {
@@ -29,6 +29,13 @@ export default function Home() {
         setTimeout(() => setIsLoaded(true), 300);
       })
       .catch((err) => console.error("Failed to preload images", err));
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get("/data/books.json")
+      .then((response) => setBooks(response.data))
+      .catch((error) => console.error("Error fetching books:", error));
   }, []);
 
   // Importar fuente cursiva dinámicamente (opcional, o poner en index.html)
@@ -61,6 +68,17 @@ export default function Home() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isLoaded]);
 
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const { current } = scrollRef;
+      const scrollAmount = current.clientWidth < 768 ? current.clientWidth : current.clientWidth / 3;
+      current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <div className={`background-fix app-container ${isLoaded ? "loaded" : ""}`}>
       {/*PORTADA PRINCIPAL */}
@@ -83,7 +101,7 @@ export default function Home() {
         <div className="relative z-10 w-full max-w-5xl mx-56 flex flex-col items-center justify-center h-full pb-20">
           {/* Texto Principal (Centrado) */}
           <div ref={nameRef} className="text-start w-full px-6 drop-shadow-lg">
-            <h2 className="text-blue-900 font-bold tracking-[0.2em] uppercase text-base md:text-lg mb-6">
+            <h2 className="text-blue-300 font-bold tracking-[0.2em] uppercase text-base md:text-lg mb-6">
               Escritor &middot; Historiador &middot; Docente
             </h2>
             <h1
@@ -101,7 +119,7 @@ export default function Home() {
                 Conocé mis libros
               </button>
               <button className="border border-[#774936] text-[#774936] px-8 py-3 rounded-sm hover:bg-[#774936] hover:text-white transition uppercase text-sm tracking-wider">
-                Leer Gratis
+                Contacto
               </button>
             </div>
           </div>
@@ -158,65 +176,71 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Libro 1 */}
-              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037] flex flex-col">
-                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
-                  <img
-                    src={nostalgias}
-                    alt="Nostalgias"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <h4 className={`text-2xl mb-2 ${cursiveFont}`}>Nostalgias</h4>
-                <p className="text-sm text-gray-300 mb-4">
-                  Una colección de relatos sobre el tiempo y el recuerdo.
-                </p>
-                <button className="text-[#90caf9] hover:text-white underline text-sm">
-                  Ver Sinopsis
-                </button>
+            <div className="relative group px-4 md:px-12">
+              {/* Botón Izquierda */}
+              <button
+                onClick={() => scroll("left")}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full transition hidden md:block"
+              >
+                &#10094;
+              </button>
+
+              <div
+                ref={scrollRef}
+                className="flex overflow-x-auto snap-x snap-mandatory gap-0 pb-4 [&::-webkit-scrollbar]:hidden"
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              >
+                {books.map((book) => (
+                  <div
+                    key={book.id}
+                    className="min-w-full md:min-w-[33.333%] p-4 snap-center"
+                  >
+                    <div
+                      className={`${
+                        book.isPreorder
+                          ? "bg-[#1e3a8a] relative overflow-hidden"
+                          : "bg-[#3e2723] border border-[#5d4037]"
+                      } p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 flex flex-col h-full`}
+                    >
+                      {book.isPreorder && (
+                        <div className="absolute top-0 right-0 bg-yellow-600 text-xs font-bold px-3 py-1">
+                          PRÓXIMAMENTE
+                        </div>
+                      )}
+                      <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
+                        <img
+                          src={book.image}
+                          alt={book.title}
+                          className="h-full w-full object-contain"
+                        />
+                      </div>
+                      <h4 className={`text-2xl mb-2 ${cursiveFont}`}>
+                        {book.title}
+                      </h4>
+                      <p className="text-sm text-gray-300 mb-4 flex-grow">
+                        {book.description}
+                      </p>
+                      <button
+                        className={
+                          book.isPreorder
+                            ? "text-white border border-white/30 px-4 py-2 rounded hover:bg-white hover:text-[#1e3a8a] transition w-full"
+                            : "text-[#90caf9] hover:text-white underline text-sm"
+                        }
+                      >
+                        {book.buttonText}
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              {/* Libro 2 */}
-              <div className="bg-[#3e2723] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 border border-[#5d4037] flex flex-col">
-                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
-                  <img
-                    src={caja}
-                    alt="La caja de los recuerdos"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <h4 className={`text-2xl mb-2 ${cursiveFont}`}>
-                  La caja de los recuerdos
-                </h4>
-                <p className="text-sm text-gray-300 mb-4">
-                  Secretos familiares que salen a la luz.
-                </p>
-                <button className="text-[#90caf9] hover:text-white underline text-sm">
-                  Ver Sinopsis
-                </button>
-              </div>
-              {/* Libro 3 (Preventa) */}
-              <div className="bg-[#1e3a8a] p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 relative overflow-hidden flex flex-col">
-                <div className="absolute top-0 right-0 bg-yellow-600 text-xs font-bold px-3 py-1">
-                  PRÓXIMAMENTE
-                </div>
-                <div className="h-96 bg-black/40 mb-4 flex items-center justify-center text-gray-400 rounded overflow-hidden">
-                  <img
-                    src={silencio}
-                    alt="Los que habitan el silencio"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <h4 className={`text-2xl mb-2 ${cursiveFont}`}>
-                  Los que habitan el silencio
-                </h4>
-                <p className="text-sm text-gray-300 mb-4">
-                  El miedo acecha en lo cotidiano.
-                </p>
-                <button className="text-white border border-white/30 px-4 py-2 rounded hover:bg-white hover:text-[#1e3a8a] transition w-full">
-                  Unirse a lista de espera
-                </button>
-              </div>
+
+              {/* Botón Derecha */}
+              <button
+                onClick={() => scroll("right")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full transition hidden md:block"
+              >
+                &#10095;
+              </button>
             </div>
           </section>
 
