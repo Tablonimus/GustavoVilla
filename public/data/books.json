@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "title": "Nostalgias",
+        "image": "/images/nostalgias.png",
+        "description": "Una colección de relatos sobre el tiempo y el recuerdo.",
+        "buttonText": "Ver Sinopsis",
+        "isPreorder": false
+    },
+    {
+        "id": 2,
+        "title": "La caja de los recuerdos",
+        "image": "/images/caja.png",
+        "description": "Secretos familiares que salen a la luz.",
+        "buttonText": "Ver Sinopsis",
+        "isPreorder": false
+    },
+    {
+        "id": 3,
+        "title": "Momentos",
+        "image": " /images/momentos.png",
+        "description": "La historia se enseña y se vive.",
+        "buttonText": "Ver Sinopsis",
+        "isPreorder": false
+    },
+    {
+        "id": 4,
+        "title": "Coronados de gloria",
+        "image": " /images/coronados.png",
+        "description": "Cada relato busca coronar con gloria aquello que no debe olivdarse.",
+        "buttonText": "Ver Sinopsis",
+        "isPreorder": false
+    }
+]

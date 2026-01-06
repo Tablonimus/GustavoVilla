@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
-import logoEquipo from "../../assets/logos/banderaArgentina.png";
+import logoEquipo from "../../assets/logos/argentina.png";
 
 export default function MyNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +26,9 @@ export default function MyNav() {
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        isScrolled || isOpen ? "bg-black/90 shadow-lg text-white" : "bg-transparent text-blue-500"
+        isScrolled || isOpen
+          ? "bg-black/90 shadow-lg text-white"
+          : "bg-transparent text-blue-500"
       }`}
     >
       <div className="container mx-auto flex h-20 items-center justify-between px-4">
