@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import bgImg from "../../assets/player/apaisada_escritor.jpeg"; 
 import tanti1 from "../../assets/images/tanti.jpeg"; 
 import "./homeStyles.css";
 
 export default function Home() {
+  const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const [books, setBooks] = useState([]);
   const heroRef = useRef(null);
@@ -196,11 +198,12 @@ export default function Home() {
                     className="min-w-full md:min-w-[33.333%] p-4 snap-center"
                   >
                     <div
+                      onClick={() => navigate(`/libros/${book.id}`)}
                       className={`${
                         book.isPreorder
                           ? "bg-[#1e3a8a] relative overflow-hidden"
                           : "bg-[#3e2723] border border-[#5d4037]"
-                      } p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 flex flex-col h-full`}
+                      } p-6 rounded shadow-xl hover:-translate-y-2 transition duration-300 flex flex-col h-full cursor-pointer`}
                     >
                       {book.isPreorder && (
                         <div className="absolute top-0 right-0 bg-yellow-600 text-xs font-bold px-3 py-1">
@@ -224,7 +227,7 @@ export default function Home() {
                         className={
                           book.isPreorder
                             ? "text-white border border-white/30 px-4 py-2 rounded hover:bg-white hover:text-[#1e3a8a] transition w-full"
-                            : "text-[#90caf9] hover:text-white underline text-sm"
+                            : "text-white border border-white/30 px-4 py-2 rounded hover:bg-white hover:text-[#1e3a8a] transition w-full"
                         }
                       >
                         {book.buttonText}

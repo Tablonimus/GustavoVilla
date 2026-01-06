@@ -4,6 +4,8 @@ import Home from "./screens/Home/Home";
 import MyNav from "./components/MyNav/MyNav";
 import Bio from "./components/Bio/Bio";
 import Footer from "./components/Footer/Footer";
+import Books from "./components/Books/Books";
+import BookDetail from "./components/Books/BookDetail";
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/bio" element={<Bio />}></Route>
+        <Route path="/libros" element={<Books />}></Route>
+        <Route path="/libros/:id" element={<BookDetail />}></Route>
       </Routes>
       <Footer />
     </BrowserRouter>

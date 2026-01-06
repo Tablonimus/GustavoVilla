@@ -60,17 +60,7 @@ export default function BookDetail() {
   )}`;
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] text-gray-800 relative animate-fade-in">
-      {/* Botón Volver */}
-      <nav className="absolute top-0 left-0 w-full p-6 z-50">
-        <button
-          onClick={() => navigate(-1)}
-          className="text-[#1e3a8a] hover:text-[#774936] font-bold flex items-center gap-2 transition text-lg"
-        >
-          &#8592; Volver
-        </button>
-      </nav>
-
+    <div className=" min-h-screen bg-[#fdfbf7] text-gray-800 relative animate-fade-in">
       <div className="container mx-auto px-6 py-24 lg:px-32 flex flex-col justify-center min-h-screen">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Columna Imagen */}
