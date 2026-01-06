@@ -17,6 +17,7 @@ export default function MyNav() {
   }, []);
 
   const navLinks = [
+    { to: "/", text: "Inicio" },
     { to: "/bio", text: "Biografía" },
     { to: "/libros", text: "Libros" },
     // { to: "/galeria", text: "Galería" },
