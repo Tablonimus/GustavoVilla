@@ -4,6 +4,7 @@
         "title": "Nostalgias",
         "full_image": "/images/full_nostalgias.jpeg",
         "image": "/images/nostalgias.jpg",
+        "full_description": "En 'Nostalgias', el tiempo no es una línea recta, sino un paisaje que se recorre con la mirada empañada por el recuerdo. A través de una serie de relatos íntimos y conmovedores, esta obra explora cómo los fragmentos del pasado construyen nuestra identidad presente. Desde los atardeceres en las sierras hasta los silencios compartidos en viejas casonas familiares, cada página es una invitación a detenerse y sentir. Es un libro para quienes entienden que recordar no es solo mirar atrás, sino volver a pasar por el corazón aquello que alguna vez nos hizo sentir vivos.",
         "description": "Una colección de relatos sobre el tiempo y el recuerdo.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false
@@ -13,6 +14,7 @@
         "title": "La caja de los recuerdos",
         "full_image": "/images/full_caja.jpeg",
         "image": "/images/cajadeltiempo.png",
+        "full_description": "¿Qué sucede cuando abrimos esa vieja caja guardada en el fondo del armario? 'La caja de los recuerdos' es un viaje hacia los secretos que las familias guardan bajo llave. Cartas sin enviar, fotografías en sepia de parientes desconocidos y objetos que cargan con historias de amor y dolor. Este libro desentraña los hilos invisibles que unen a las generaciones, revelando que heredar no es solo recibir bienes materiales, sino también hacerse cargo de las historias inconclusas de nuestros antepasados.",
         "description": "Secretos familiares que salen a la luz.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false
@@ -22,6 +24,7 @@
         "title": "Momentos",
         "full_image": "/images/full_momentos.jpeg",
         "image": " /images/momentos.png",
+        "full_description": "La historia no vive solo en los libros de texto; vive en los instantes cotidianos que a menudo pasamos por alto. 'Momentos' recopila crónicas breves y reflexiones donde la gran Historia se cruza con las pequeñas historias de la gente común. Con una prosa ágil y emotiva, se rescatan anécdotas de pueblo, lecciones aprendidas en el aula y esos segundos fugaces que, sin saberlo, definen el rumbo de una vida. Una obra que nos recuerda que somos, ante todo, la suma de nuestros momentos.",
         "description": "La historia se enseña y se vive.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false
@@ -31,6 +34,7 @@
         "title": "Coronados de gloria",
         "full_image": "/images/full_coronados.jpeg",
         "image": " /images/coronados.png",
+        "full_description": "Un homenaje vibrante a los héroes anónimos y a los hitos que forjaron nuestra nación. 'Coronados de gloria' no busca el bronce frío de las estatuas, sino el calor humano detrás de la gesta. A través de una narrativa épica pero cercana, este libro revive los sacrificios, las pasiones y los sueños de aquellos que construyeron la patria. Es una lectura obligada para comprender que la gloria no es un destino final, sino el camino que se recorre con convicción y coraje.",
         "description": "Cada relato busca coronar con gloria aquello que no debe olivdarse.",
         "buttonText": "Ver Sinopsis",
         "isPreorder": false

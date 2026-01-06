@@ -100,7 +100,7 @@ export default function Home() {
         </div>
 
         {/* Elementos Flotantes (Parallax) */}
-        <div className="relative z-10 w-full max-w-5xl mx-56 flex flex-col items-center justify-center h-full pb-20">
+        <div className="relative z-10 w-full max-w-5xl lg:mx-56 flex flex-col items-center justify-center h-full pb-20">
           {/* Texto Principal (Centrado) */}
           <div ref={nameRef} className="text-start w-full px-6 drop-shadow-lg">
             <h2 className="text-blue-300 font-bold tracking-[0.2em] uppercase text-base md:text-lg mb-6">
