@@ -3,7 +3,7 @@ function Contacto() {  // Estilos compartidos
   const bodyFont = "font-serif";
 
   // Datos de contacto (Reemplazar con los reales)
-  const whatsappNumber = "5491112345678";
+  const whatsappNumber = "5493541577457";
   const emailAddress = "contacto@gustavovilla.com";
 
   return (

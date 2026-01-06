@@ -53,7 +53,7 @@ export default function BookDetail() {
 
   // Configuración del mensaje de WhatsApp
   // Reemplaza '5491112345678' con el número real de contacto
-  const whatsappNumber = "5491112345678";
+  const whatsappNumber = "5493541577457";
   const message = `Hola, estoy interesado en el libro "${book.title}" y me gustaría obtener un ejemplar.`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     message
