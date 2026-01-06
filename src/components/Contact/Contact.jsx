@@ -4,7 +4,7 @@ function Contacto() {  // Estilos compartidos
 
   // Datos de contacto (Reemplazar con los reales)
   const whatsappNumber = "5493541577457";
-  const emailAddress = "contacto@gustavovilla.com";
+  const emailAddress = "ttvgus@gmail.com";
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] animate-fade-in pt-20">
