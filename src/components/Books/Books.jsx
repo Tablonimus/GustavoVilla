@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 
 export default function Books() {
   const [books, setBooks] = useState([]);
@@ -12,16 +13,23 @@ export default function Books() {
   const bodyFont = "font-serif";
 
   useEffect(() => {
-    axios
-      .get("/data/books.json")
-      .then((response) => {
-        setBooks(response.data);
+    const fetchBooks = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "books"));
+        // Mapeamos los documentos para incluir el ID de Firestore
+        const booksData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBooks(booksData);
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching books:", error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchBooks();
   }, []);
 
   if (loading) {

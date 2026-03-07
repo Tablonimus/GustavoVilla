@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 import bgImg from "../../assets/player/apaisada_escritor.jpeg";
 import tanti1 from "../../assets/images/tanti.jpeg";
 import "./homeStyles.css";
@@ -33,11 +34,21 @@ export default function Home() {
       .catch((err) => console.error("Failed to preload images", err));
   }, []);
 
+  // --- Fetch de libros desde Firestore ---
   useEffect(() => {
-    axios
-      .get("/data/books.json")
-      .then((response) => setBooks(response.data))
-      .catch((error) => console.error("Error fetching books:", error));
+    const fetchBooks = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "books"));
+        const booksData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBooks(booksData);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    };
+    fetchBooks();
   }, []);
 
   // Importar fuente cursiva dinámicamente (opcional, o poner en index.html)

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 
 export default function BookDetail() {
   const { id } = useParams();
@@ -13,18 +14,25 @@ export default function BookDetail() {
   const bodyFont = "font-serif";
 
   useEffect(() => {
-    axios
-      .get("/data/books.json")
-      .then((response) => {
-        // Buscamos el libro que coincida con el ID de la URL
-        const foundBook = response.data.find((b) => b.id == id);
-        setBook(foundBook);
+    const fetchBook = async () => {
+      try {
+        const docRef = doc(db, "books", id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setBook({ id: docSnap.id, ...docSnap.data() });
+        } else {
+          console.log("No such document!");
+          setBook(null);
+        }
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching book details:", error);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchBook();
   }, [id]);
 
   if (loading) {
@@ -52,7 +60,6 @@ export default function BookDetail() {
   }
 
   // Configuración del mensaje de WhatsApp
-  // Reemplaza '5491112345678' con el número real de contacto
   const whatsappNumber = "5493541577457";
   const message = `Hola, estoy interesado en el libro "${book.title}" y me gustaría obtener un ejemplar.`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
