@@ -186,6 +186,29 @@ export default function Home() {
             </div>
           </section>
 
+          {/* 1.5. RECONOCIMIENTOS (Sección Intermedia - Prueba Social) */}
+          <section className="py-20 px-6 lg:px-56 bg-[#774936] text-white text-center relative overflow-hidden">
+            {/* Elemento decorativo de fondo */}
+            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+              <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-white blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-80 h-80 rounded-full bg-[#1e3a8a] blur-3xl"></div>
+            </div>
+
+            <div className="relative z-10 max-w-3xl mx-auto">
+              <h3 className={`text-3xl md:text-4xl mb-6 ${cursiveFont}`}>
+                Distinciones y Premios
+              </h3>
+              <p className={`text-lg md:text-xl text-orange-50 mb-8 leading-relaxed ${bodyFont}`}>
+                "El mayor premio es la conexión con el lector, pero agradezco profundamente las menciones que han abrazado mi obra a lo largo del camino."
+              </p>
+              <Link to="/reconocimientos">
+                <button className="border-2 border-white text-white px-8 py-3 rounded hover:bg-white hover:text-[#774936] transition duration-300 uppercase text-sm tracking-widest font-bold">
+                  Ver Reconocimientos
+                </button>
+              </Link>
+            </div>
+          </section>
+
           {/* 2. LIBROS PUBLICADOS (Fondo Marrón/Oscuro para resaltar portadas) */}
           <section className="py-24 px-6 lg:px-56 bg-[#2c1a12] text-[#fdfbf7]">
             <div className="text-center mb-16">

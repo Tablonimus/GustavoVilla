@@ -1,0 +1,20 @@
+[
+    {
+        "title": "Premio a la Trayectoria Literaria",
+        "description": "Otorgado en reconocimiento a una vida dedicada a la exploración de la memoria y la identidad a través de la literatura.",
+        "image": "/images/recognitions/premio-trayectoria.jpg",
+        "issuer": "Fundación de las Artes"
+    },
+    {
+        "title": "Mención de Honor en Concurso de Relato Histórico",
+        "description": "Por el relato 'El último guardián del faro', que rescata una figura olvidada de la historia costera local con gran sensibilidad y rigor documental.",
+        "image": "/images/recognitions/mencion-honor.jpg",
+        "issuer": "Sociedad de Historiadores Nacionales"
+    },
+    {
+        "title": "Pluma de Plata",
+        "description": "Galardón otorgado por la comunidad de lectores en la Feria del Libro Regional, destacando la obra 'Nostalgias' como la más conmovedora del año.",
+        "image": "/images/recognitions/pluma-plata.jpg",
+        "issuer": "Feria del Libro Regional"
+    }
+]

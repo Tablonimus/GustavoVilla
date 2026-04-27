@@ -47,6 +47,7 @@ export default function AdminBooks() {
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null); // Archivo de portada
   const [fullImageFile, setFullImageFile] = useState(null); // Archivo de fondo
+  const [recognitionImageFile, setRecognitionImageFile] = useState(null); // Archivo de reconocimiento
 
   const [recognitions, setRecognitions] = useState([]);
   const [editingRecognitionId, setEditingRecognitionId] = useState(null)
@@ -175,8 +176,56 @@ export default function AdminBooks() {
     setView("form"); // Cambiar a vista de formulario
   };
 
-  const handleEditRecognition = (rec) => {
+  // --- RECONOCIMIENTOS: FUNCIONES CRUD ---
+  const handleSaveRecognition = async (e) => {
+    e.preventDefault();
+    setUploading(true);
+    try {
+      let imageUrl = formRecognitionData.image;
+      
+      // Subir imagen si existe nueva
+      if (recognitionImageFile) {
+        const imageRef = ref(storage, `recognition_covers/${Date.now()}_${recognitionImageFile.name}`);
+        const snapshot = await uploadBytes(imageRef, recognitionImageFile);
+        imageUrl = await getDownloadURL(snapshot.ref);
+      }
 
+      const dataToSave = { ...formRecognitionData, image: imageUrl };
+
+      if (editingRecognitionId) {
+        const docRef = doc(db, "recognitions", editingRecognitionId);
+        await updateDoc(docRef, dataToSave);
+        alert("Reconocimiento actualizado correctamente");
+      } else {
+        await addDoc(collection(db, "recognitions"), dataToSave);
+        alert("Reconocimiento creado correctamente");
+      }
+      resetRecognitionForm();
+      fetchRecognitions();
+    } catch (error) {
+      console.error("Error saving recognition:", error);
+      alert("Error al guardar el reconocimiento");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteRecognition = async (id) => {
+    if (window.confirm("¿Estás seguro de querer eliminar este reconocimiento?")) {
+      try {
+        await deleteDoc(doc(db, "recognitions", id));
+        fetchRecognitions();
+      } catch (error) {
+        console.error("Error deleting recognition:", error);
+      }
+    }
+  };
+
+  const handleEditRecognition = (rec) => {
+    setEditingRecognitionId(rec.id);
+    setFormRecognitionData(rec);
+    setRecognitionImageFile(null);
+    setView("form");
   }
 
   const resetForm = () => {
@@ -184,6 +233,18 @@ export default function AdminBooks() {
     setEditingId(null);
     setImageFile(null);
     setFullImageFile(null);
+    setView("list");
+  };
+
+  const resetRecognitionForm = () => {
+    setFormRecognitionData({
+      title: "",
+      description: "",
+      image: "",
+      issuer: "",
+    });
+    setEditingRecognitionId(null);
+    setRecognitionImageFile(null);
     setView("list");
   };
 
@@ -195,12 +256,21 @@ export default function AdminBooks() {
     }));
   };
 
+  const handleRecognitionChange = (e) => {
+    const { name, value } = e.target;
+    setFormRecognitionData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleFileChange = (e, field) => {
     if (field === "image") {
       setImageFile(e.target.files[0]);
     } else if (field === "full_image") {
       setFullImageFile(e.target.files[0]);
     }
+  };
+
+  const handleRecognitionFileChange = (e) => {
+    setRecognitionImageFile(e.target.files[0]);
   };
 
   useEffect(() => {
@@ -237,7 +307,7 @@ export default function AdminBooks() {
             {/* Aquí se pueden agregar más módulos en el futuro */}
             <li 
               className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'recognitions' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
-              onClick={() => { setActiveTab('recognitions'); setRecView('list'); }}
+              onClick={() => { setActiveTab('recognitions'); setView('list'); }}
             >
               <IconAward />
               {sidebarOpen && <span>Reconocimientos</span>}
@@ -257,21 +327,29 @@ export default function AdminBooks() {
         {/* HEADER SUPERIOR */}
         <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">Gestión de Libros</h1>
-            <p className="text-gray-500">Administra el catálogo de obras literarias.</p>
+            <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">
+              {activeTab === 'books' ? "Gestión de Libros" : "Gestión de Reconocimientos"}
+            </h1>
+            <p className="text-gray-500">
+              {activeTab === 'books' ? "Administra el catálogo de obras literarias." : "Administra los premios y menciones recibidos."}
+            </p>
           </div>
           {view === "list" && (
             <button 
-              onClick={() => { resetForm(); setView("form"); }}
+              onClick={() => { 
+                if (activeTab === 'books') resetForm(); 
+                else resetRecognitionForm();
+                setView("form"); 
+              }}
               className="bg-[#774936] text-white px-4 py-2 rounded shadow hover:bg-[#5d3a2a] transition flex items-center gap-2"
             >
-              <IconPlus /> Nuevo Libro
+              <IconPlus /> {activeTab === 'books' ? "Nuevo Libro" : "Nuevo Reconocimiento"}
             </button>
           )}
         </header>
 
-        {/* --- VISTA: FORMULARIO --- */}
-        {view === "form" && (
+        {/* --- VISTA: FORMULARIO LIBROS --- */}
+        {activeTab === 'books' && view === "form" && (
         <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-fade-in">
           <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-[#774936] mb-4">
@@ -384,8 +462,8 @@ export default function AdminBooks() {
         </div>
         )}
 
-        {/* --- VISTA: LISTADO (TABLA) --- */}
-        {view === "list" && (
+        {/* --- VISTA: LISTADO LIBROS (TABLA) --- */}
+        {activeTab === 'books' && view === "list" && (
         <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
           {loading ? (
             <div className="p-12 text-center text-gray-500">Cargando catálogo...</div>
@@ -448,6 +526,129 @@ export default function AdminBooks() {
             </div>
           )}
         </div>
+        )}
+
+        {/* --- VISTA: FORMULARIO RECONOCIMIENTOS --- */}
+        {activeTab === 'recognitions' && view === "form" && (
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#774936] mb-4">
+                {editingRecognitionId ? "Editar Reconocimiento" : "Agregar Nuevo Reconocimiento"}
+              </h2>
+              <button onClick={resetRecognitionForm} className="text-gray-500 hover:text-[#1e3a8a] flex items-center gap-1">
+                <IconArrowLeft /> Volver a la lista
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveRecognition} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Título del Premio</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formRecognitionData.title}
+                  onChange={handleRecognitionChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+              
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Otorgado por (Issuer)</label>
+                <input
+                  type="text"
+                  name="issuer"
+                  value={formRecognitionData.issuer}
+                  onChange={handleRecognitionChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Descripción</label>
+                <textarea
+                  name="description"
+                  value={formRecognitionData.description}
+                  onChange={handleRecognitionChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  rows="3"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Imagen</label>
+                {formRecognitionData.image && <img src={formRecognitionData.image} alt="Actual" className="h-20 mb-2 rounded object-cover" />}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleRecognitionFileChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required={!editingRecognitionId}
+                />
+              </div>
+
+              <div className="col-span-2 flex gap-4 mt-4">
+                <button
+                  type="submit"
+                  className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
+                  disabled={uploading}
+                >
+                  {uploading ? "Guardando..." : (editingRecognitionId ? "Actualizar" : "Guardar")}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetRecognitionForm}
+                  className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition font-bold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* --- VISTA: LISTADO RECONOCIMIENTOS (TABLA) --- */}
+        {activeTab === 'recognitions' && view === "list" && (
+          <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+            {loading ? (
+              <div className="p-12 text-center text-gray-500">Cargando reconocimientos...</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase text-xs tracking-wider">
+                      <th className="p-4">Imagen</th>
+                      <th className="p-4">Título</th>
+                      <th className="p-4">Otorgado por</th>
+                      <th className="p-4 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {recognitions.map((rec) => (
+                      <tr key={rec.id} className="hover:bg-gray-50 transition">
+                        <td className="p-4">
+                          <img src={rec.image} alt={rec.title} className="w-12 h-12 object-cover rounded shadow-sm" />
+                        </td>
+                        <td className="p-4 font-bold text-[#1e3a8a]">{rec.title}</td>
+                        <td className="p-4 text-gray-600">{rec.issuer}</td>
+                        <td className="p-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => handleEditRecognition(rec)} className="text-blue-600 hover:bg-blue-50 p-2 rounded transition"><IconEdit /></button>
+                            <button onClick={() => handleDeleteRecognition(rec.id)} className="text-red-600 hover:bg-red-50 p-2 rounded transition"><IconTrash /></button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                    {recognitions.length === 0 && (
+                      <tr><td colSpan="4" className="p-8 text-center text-gray-500">No hay reconocimientos registrados.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         )}
 
       </main>

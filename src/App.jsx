@@ -8,6 +8,7 @@ import Books from "./components/Books/Books";
 import BookDetail from "./components/Books/BookDetail";
 import Contacto from "./components/Contact/Contact";
 import AdminBooks from "./screens/Admin/Dashboard";
+import Recognitions from "./components/Recognitions/Recognitions";
 
 const PublicLayout = () => (
   <>
@@ -27,6 +28,7 @@ function App() {
           <Route path="/bio" element={<Bio />}></Route>
           <Route path="/libros" element={<Books />}></Route>
           <Route path="/libros/:id" element={<BookDetail />}></Route>
+          <Route path="/reconocimientos" element={<Recognitions />}></Route>
           <Route path="/contacto" element={<Contacto />}></Route>
         </Route>
 
