@@ -1,4 +1,6 @@
-function Contacto() {  // Estilos compartidos
+import { Helmet } from "react-helmet-async";
+
+export default function Contacto() {  // Estilos compartidos
   const cursiveFont = "font-['Playfair_Display',_serif] italic";
   const bodyFont = "font-serif";
 
@@ -7,7 +9,13 @@ function Contacto() {  // Estilos compartidos
   const emailAddress = "ttvgus@gmail.com";
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] animate-fade-in pt-20">
+    <>
+      <Helmet>
+        <title>Contacto - Gustavo Villa</title>
+        <meta name="description" content="Contacta a Gustavo Villa para consultas sobre sus libros, presentaciones o colaboraciones literarias." />
+        <link rel="canonical" href="https://gustavovilla.com/contacto" />
+      </Helmet>
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in pt-20">
       {/* --- HEADER / HERO --- */}
       <section className="bg-[#1e3a8a] py-20 px-6 lg:px-32 text-white text-center shadow-xl relative z-10">
         <h1 className={`text-5xl md:text-6xl mb-6 ${cursiveFont}`}>
@@ -95,7 +103,6 @@ function Contacto() {  // Estilos compartidos
         </div>
       </section>
     </div>
+    </>
   );
 }
-
-export default Contacto;

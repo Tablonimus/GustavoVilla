@@ -1,4 +1,5 @@
 
+import { Helmet } from "react-helmet-async";
 import portraitImg from "../../assets/player/frente_escritor.jpeg";
 import landscapeImg from "../../assets/player/apaisada_escritor.jpeg";
 import diplomaImg from "../../assets/images/diploma_2.jpeg";
@@ -9,7 +10,13 @@ export default function Bio() {
   const bodyFont = "font-serif";
 
   return (
-    <div className="bg-[#fdfbf7] min-h-screen py-20 px-6 lg:px-32 text-gray-800">
+    <>
+      <Helmet>
+        <title>Biografía de Gustavo Villa - Escritor e Historiador</title>
+        <meta name="description" content="Conoce la biografía de Gustavo Villa, escritor e historiador de Tanti, Córdoba. Su trayectoria en la literatura y la enseñanza." />
+        <link rel="canonical" href="https://gustavovilla.com/bio" />
+      </Helmet>
+      <div className="bg-[#fdfbf7] min-h-screen py-20 px-6 lg:px-32 text-gray-800">
       <div className="max-w-5xl mx-auto animate-fade-in">
         
         {/* --- ENCABEZADO --- */}
@@ -129,5 +136,6 @@ export default function Bio() {
 
       </div>
     </div>
+    </>
   );
 }

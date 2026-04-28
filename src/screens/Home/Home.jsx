@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 import bgImg from "../../assets/player/apaisada_escritor.jpeg";
@@ -96,7 +97,36 @@ export default function Home() {
   };
 
   return (
-    <div className={`background-fix app-container ${isLoaded ? "loaded" : ""}`}>
+    <>
+      <Helmet>
+        <title>Gustavo Villa - Escritor e Historiador</title>
+        <meta name="description" content="Sitio oficial de Gustavo Villa, escritor, historiador y docente de Tanti, Córdoba. Explora sus obras literarias, biografía y proyectos sobre memoria e identidad." />
+        <meta name="keywords" content="Gustavo Villa, escritor, historiador, docente, Tanti, Córdoba, literatura argentina, libros, Nostalgias, La caja de los recuerdos, Momentos, Coronados de gloria, cultura, memoria" />
+        <link rel="canonical" href="https://gustavovilla.com/" />
+        <meta property="og:title" content="Gustavo Villa - Escritor e Historiador" />
+        <meta property="og:description" content="Sitio oficial de Gustavo Villa. Historias que unen memoria, identidad y emoción. Conoce sus libros y trayectoria." />
+        <meta property="og:image" content="https://gustavovilla.com/og-image.jpg" />
+        <meta property="twitter:title" content="Gustavo Villa - Escritor e Historiador" />
+        <meta property="twitter:description" content="Sitio oficial de Gustavo Villa. Historias que unen memoria, identidad y emoción. Conoce sus libros y trayectoria." />
+        <meta property="twitter:image" content="https://gustavovilla.com/og-image.jpg" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": "Gustavo Villa",
+            "jobTitle": "Escritor, Historiador y Docente",
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": "Tanti",
+              "addressRegion": "Córdoba",
+              "addressCountry": "AR"
+            },
+            "url": "https://gustavovilla.com",
+            "sameAs": []
+          })}
+        </script>
+      </Helmet>
+      <div className={`background-fix app-container ${isLoaded ? "loaded" : ""}`}>
       {/*PORTADA PRINCIPAL */}
       <div
         ref={heroRef}
@@ -311,5 +341,6 @@ export default function Home() {
         </div>
       </scroll-container>
     </div>
+    </>
   );
 }

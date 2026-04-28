@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 
@@ -67,7 +68,34 @@ export default function BookDetail() {
   )}`;
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
+    <>
+      <Helmet>
+        <title>{book.title} - Libro de Gustavo Villa</title>
+        <meta name="description" content={book.description} />
+        <link rel="canonical" href={`https://gustavovilla.com/libros/${book.id}`} />
+        <meta property="og:title" content={`${book.title} - Gustavo Villa`} />
+        <meta property="og:description" content={book.description} />
+        <meta property="og:image" content={book.image} />
+        <meta property="og:url" content={`https://gustavovilla.com/libros/${book.id}`} />
+        <meta property="twitter:title" content={`${book.title} - Gustavo Villa`} />
+        <meta property="twitter:description" content={book.description} />
+        <meta property="twitter:image" content={book.image} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Book",
+            "name": book.title,
+            "author": {
+              "@type": "Person",
+              "name": "Gustavo Villa"
+            },
+            "description": book.description,
+            "image": book.image,
+            "url": `https://gustavovilla.com/libros/${book.id}`
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
       {/* --- HERO SECTION con Full Image de fondo --- */}
       <div className="relative w-full min-h-[85vh] flex items-center justify-center bg-[#2c1a12] overflow-hidden">
         {/* Background Image con Blur/Overlay */}
@@ -168,7 +196,8 @@ export default function BookDetail() {
             </p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

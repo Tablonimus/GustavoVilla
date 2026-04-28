@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 
@@ -41,7 +42,13 @@ export default function Books() {
   }
 
   return (
-    <div className="min-h-screen bg-[#2c1a12] animate-fade-in">
+    <>
+      <Helmet>
+        <title>Libros de Gustavo Villa - Catálogo de Obras Literarias</title>
+        <meta name="description" content="Explora el catálogo completo de libros de Gustavo Villa. Desde Nostalgias hasta Coronados de gloria, historias que unen memoria e identidad." />
+        <link rel="canonical" href="https://gustavovilla.com/libros" />
+      </Helmet>
+      <div className="min-h-screen bg-[#2c1a12] animate-fade-in">
       {/* Sección Introductoria */}
       <section className="bg-[#1e3a8a] mt-20 pt-16 pb-20 px-6 lg:px-32 text-white shadow-2xl relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -106,7 +113,8 @@ export default function Books() {
             </div>
           );
         })}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

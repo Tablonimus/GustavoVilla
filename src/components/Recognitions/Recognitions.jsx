@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../../firebase";
 
@@ -38,7 +39,13 @@ export default function Recognitions() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
+    <>
+      <Helmet>
+        <title>Reconocimientos de Gustavo Villa - Premios y Menciones</title>
+        <meta name="description" content="Descubre los reconocimientos y premios recibidos por Gustavo Villa en su carrera literaria e histórica." />
+        <link rel="canonical" href="https://gustavovilla.com/reconocimientos" />
+      </Helmet>
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
       {/* Sección Introductoria */}
       <section className="bg-[#774936] mt-20 pt-16 pb-20 px-6 lg:px-32 text-white shadow-2xl relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -92,5 +99,6 @@ export default function Recognitions() {
         )}
       </div>
     </div>
+    </>
   );
 }

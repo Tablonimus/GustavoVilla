@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useBooks } from "../../hooks/useBooks";
 import { useRecognitions } from "../../hooks/useRecognitions";
 
@@ -165,7 +166,11 @@ export default function AdminBooks() {
 
   // --- RENDERIZADO ---
   return (
-    <div className="min-h-screen bg-gray-100 flex font-sans text-gray-800">
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen bg-gray-100 flex font-sans text-gray-800">
       
       {/* --- SIDEBAR --- */}
       <aside className={`${sidebarOpen ? "w-64" : "w-20"} bg-[#1e3a8a] text-white transition-all duration-300 flex flex-col fixed h-full z-20 shadow-xl`}>
@@ -534,5 +539,6 @@ export default function AdminBooks() {
 
       </main>
     </div>
+    </>
   );
 }
