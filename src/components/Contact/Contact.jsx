@@ -83,13 +83,10 @@ export default function Contacto() {  // Estilos compartidos
           </p>
           
           <div className="flex flex-col md:flex-row justify-center gap-6">
-            <a
-              href={`mailto:${emailAddress}`}
-              className="bg-transparent border-2 border-white text-white px-8 py-4 rounded hover:bg-white hover:text-[#2c1a12] transition duration-300 uppercase font-bold tracking-wider flex items-center justify-center gap-3 min-w-[200px]"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-              Enviar Correo
-            </a>
+            <div className="bg-transparent border-2 border-white text-white px-8 py-4 rounded flex flex-col items-center justify-center gap-2 min-w-[200px]">
+              <span className="uppercase font-bold tracking-wider text-sm">Correo Electrónico</span>
+              <span className={`text-lg ${bodyFont}`}>{emailAddress}</span>
+            </div>
             <a
               href={`https://wa.me/${whatsappNumber}`}
               target="_blank"
