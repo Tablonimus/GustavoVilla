@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { db, storage } from "../../../firebase"; // Importamos storage
 import {
   collection,
@@ -73,7 +73,8 @@ export default function AdminBooks() {
       issuer: "",
     });
 
-  const booksCollectionRef = collection(db, "books");
+  const booksCollectionRef = useMemo(() => collection(db, "books"), []);
+  const recognitionsCollectionRef = useMemo(() => collection(db, "recognitions"), []);
 
   // --- LEER (Read) ---
   const fetchBooks = useCallback(async () => {
@@ -92,16 +93,16 @@ export default function AdminBooks() {
   }, [fetchBooks]);
 
     // --- RECONOCIMIENTOS: LEER (Read) ---
-    const fetchRecognitions = async () => {
+    const fetchRecognitions = useCallback(async () => {
       setLoading(true);
       try {
-        const data = await getDocs(collection(db, "recognitions"));
+        const data = await getDocs(recognitionsCollectionRef);
         setRecognitions(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
       } catch (error) {
         console.error("Error fetching recognitions:", error);
       }
       setLoading(false);
-    };
+    }, [recognitionsCollectionRef]);
   
 
 
@@ -197,7 +198,7 @@ export default function AdminBooks() {
         await updateDoc(docRef, dataToSave);
         alert("Reconocimiento actualizado correctamente");
       } else {
-        await addDoc(collection(db, "recognitions"), dataToSave);
+        await addDoc(recognitionsCollectionRef, dataToSave);
         alert("Reconocimiento creado correctamente");
       }
       resetRecognitionForm();
@@ -277,7 +278,7 @@ export default function AdminBooks() {
     if (activeTab === 'recognitions') {
       fetchRecognitions();
     }
-  }, [activeTab]);
+  }, [activeTab, fetchRecognitions]);
 
 
 
