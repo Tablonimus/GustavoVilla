@@ -135,6 +135,7 @@ export default function Home() {
         name: name,
         location: location || null,
         message: message,
+        is_approved: false,
         createdAt: serverTimestamp(),
       });
 

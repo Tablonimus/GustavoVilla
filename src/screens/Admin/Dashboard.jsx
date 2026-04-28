@@ -86,10 +86,15 @@ export default function AdminBooks() {
     });
 
    // --- EFECTOS PARA CARGAR DATOS ---
-   useEffect(() => {
-     fetchBooks();
-   }, [fetchBooks]);
 
+
+    // Cargar libros inicialmente (solo en montaje)
+    useEffect(() => {
+      fetchBooks();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Refrescar datos cuando se cambia de pestaña
    // --- FUNCIONES PARA COMENTARIOS ---
    const fetchComments = useCallback(async () => {
      setCommentsLoading(true);
@@ -222,13 +227,16 @@ export default function AdminBooks() {
   };
 
    useEffect(() => {
-     if (activeTab === 'recognitions') {
-       fetchRecognitions();
-     }
-     if (activeTab === 'comments') {
-       fetchComments();
-     }
-   }, [activeTab, fetchRecognitions, fetchComments]);
+      if (activeTab === 'books') {
+        fetchBooks();
+      }
+      if (activeTab === 'recognitions') {
+        fetchRecognitions();
+      }
+      if (activeTab === 'comments') {
+        fetchComments();
+      }
+    }, [activeTab, fetchBooks, fetchRecognitions, fetchComments]);
 
 
 
@@ -431,7 +439,7 @@ export default function AdminBooks() {
         {/* --- VISTA: LISTADO LIBROS (TABLA) --- */}
         {activeTab === 'books' && view === "list" && (
         <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-            {recognitionsLoading ? (
+             {booksLoading ? (
             <div className="p-12 text-center text-gray-500">Cargando catálogo...</div>
           ) : (
             <div className="overflow-x-auto">
@@ -578,7 +586,7 @@ export default function AdminBooks() {
         {/* --- VISTA: LISTADO RECONOCIMIENTOS (TABLA) --- */}
         {activeTab === 'recognitions' && view === "list" && (
           <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-          {booksLoading ? (
+           {recognitionsLoading ? (
               <div className="p-12 text-center text-gray-500">Cargando reconocimientos...</div>
             ) : (
               <div className="overflow-x-auto">
