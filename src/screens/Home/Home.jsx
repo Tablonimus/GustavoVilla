@@ -199,7 +199,7 @@ export default function Home() {
                 Distinciones y Premios
               </h3>
               <p className={`text-lg md:text-xl text-orange-50 mb-8 leading-relaxed ${bodyFont}`}>
-                "El mayor premio es la conexión con el lector, pero agradezco profundamente las menciones que han abrazado mi obra a lo largo del camino."
+                &ldquo;El mayor premio es la conexión con el lector, pero agradezco profundamente las menciones que han abrazado mi obra a lo largo del camino.&rdquo;
               </p>
               <Link to="/reconocimientos">
                 <button className="border-2 border-white text-white px-8 py-3 rounded hover:bg-white hover:text-[#774936] transition duration-300 uppercase text-sm tracking-widest font-bold">

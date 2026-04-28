@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { db, storage } from "../../../firebase"; // Importamos storage
 import {
   collection,
@@ -37,7 +37,7 @@ export default function AdminBooks() {
   // --- ESTADOS DE NAVEGACIÓN ---
   const [activeTab, setActiveTab] = useState("books"); // 'books', 'settings', etc.
   const [view, setView] = useState("list"); // 'list' | 'form'
-  const [recView, setRecView] = useState("list"); // reconocimientos view
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // --- ESTADOS DE DATOS ---
@@ -76,7 +76,7 @@ export default function AdminBooks() {
   const booksCollectionRef = collection(db, "books");
 
   // --- LEER (Read) ---
-  const fetchBooks = async () => {
+  const fetchBooks = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getDocs(booksCollectionRef);
@@ -85,11 +85,11 @@ export default function AdminBooks() {
       console.error("Error fetching books:", error);
     }
     setLoading(false);
-  };
+  }, [booksCollectionRef]);
 
   useEffect(() => {
     fetchBooks();
-  }, []);
+  }, [fetchBooks]);
 
     // --- RECONOCIMIENTOS: LEER (Read) ---
     const fetchRecognitions = async () => {

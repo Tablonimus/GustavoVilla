@@ -56,7 +56,7 @@ export default function Recognitions() {
 
       {/* Lista de Reconocimientos */}
       <div className="max-w-6xl mx-auto px-6 lg:px-32 py-20 grid gap-12">
-        {recognitions.map((item, index) => (
+        {recognitions.map((item) => (
           <div
             key={item.id}
             className="flex flex-col md:flex-row items-center bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300"

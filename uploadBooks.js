@@ -29,7 +29,8 @@ const uploadBooks = async () => {
   console.log("Iniciando la carga de libros a Firestore...");
 
   for (const book of booksData) {
-    const { id, ...bookToUpload } = book; // Quitamos el ID numérico del JSON
+    const bookToUpload = { ...book };
+    delete bookToUpload.id; // Quitamos el ID numérico del JSON
     await booksCollection.add(bookToUpload);
     console.log(`✅ Libro agregado: "${book.title}"`);
   }

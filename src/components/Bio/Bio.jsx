@@ -1,4 +1,4 @@
-import React from "react";
+
 import portraitImg from "../../assets/player/frente_escritor.jpeg";
 import landscapeImg from "../../assets/player/apaisada_escritor.jpeg";
 import diplomaImg from "../../assets/images/diploma_2.jpeg";
