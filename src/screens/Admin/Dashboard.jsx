@@ -1,14 +1,6 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { db, storage } from "../../../firebase"; // Importamos storage
-import {
-  collection,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useState, useEffect } from "react";
+import { useBooks } from "../../hooks/useBooks";
+import { useRecognitions } from "../../hooks/useRecognitions";
 
 // --- ICONOS SVG (Componentes simples para no depender de librerías externas) ---
 const IconBook = () => (
@@ -40,16 +32,15 @@ export default function AdminBooks() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // --- ESTADOS DE DATOS ---
-  const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false); // Estado para la carga de imágenes
+  // --- HOOKS PARA DATOS ---
+  const { books, loading: booksLoading, uploading: booksUploading, fetchBooks, handleSubmit: handleBookSubmit, handleDelete: handleBookDelete } = useBooks();
+  const { recognitions, loading: recognitionsLoading, uploading: recognitionsUploading, fetchRecognitions, handleSaveRecognition, handleDeleteRecognition } = useRecognitions();
+
+  // --- ESTADOS DE FORMULARIOS ---
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null); // Archivo de portada
   const [fullImageFile, setFullImageFile] = useState(null); // Archivo de fondo
   const [recognitionImageFile, setRecognitionImageFile] = useState(null); // Archivo de reconocimiento
-
-  const [recognitions, setRecognitions] = useState([]);
   const [editingRecognitionId, setEditingRecognitionId] = useState(null)
 
   // Estado inicial del formulario limpio
@@ -73,100 +64,30 @@ export default function AdminBooks() {
       issuer: "",
     });
 
-  const booksCollectionRef = useMemo(() => collection(db, "books"), []);
-  const recognitionsCollectionRef = useMemo(() => collection(db, "recognitions"), []);
-
-  // --- LEER (Read) ---
-  const fetchBooks = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getDocs(booksCollectionRef);
-      setBooks(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    }
-    setLoading(false);
-  }, [booksCollectionRef]);
-
+  // --- EFECTOS PARA CARGAR DATOS ---
   useEffect(() => {
     fetchBooks();
   }, [fetchBooks]);
 
-    // --- RECONOCIMIENTOS: LEER (Read) ---
-    const fetchRecognitions = useCallback(async () => {
-      setLoading(true);
-      try {
-        const data = await getDocs(recognitionsCollectionRef);
-        setRecognitions(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
-      } catch (error) {
-        console.error("Error fetching recognitions:", error);
-      }
-      setLoading(false);
-    }, [recognitionsCollectionRef]);
-  
 
 
-  // --- CREAR (Create) y ACTUALIZAR (Update) ---
-  const handleSubmit = async (e) => {
+
+  // --- MANEJADORES PARA LIBROS ---
+  const handleBookFormSubmit = async (e) => {
     e.preventDefault();
-    setUploading(true);
-
-    try {
-      let imageUrl = formData.image;
-      let fullImageUrl = formData.full_image;
-
-      // 1. Subir imagen de portada si se seleccionó una nueva
-      if (imageFile) {
-        const imageRef = ref(storage, `book_covers/${Date.now()}_${imageFile.name}`);
-        const snapshot = await uploadBytes(imageRef, imageFile);
-        imageUrl = await getDownloadURL(snapshot.ref);
-      }
-
-      // 2. Subir imagen completa si se seleccionó una nueva
-      if (fullImageFile) {
-        const fullImageRef = ref(storage, `book_full/${Date.now()}_${fullImageFile.name}`);
-        const snapshot = await uploadBytes(fullImageRef, fullImageFile);
-        fullImageUrl = await getDownloadURL(snapshot.ref);
-      }
-
-      const dataToSave = { ...formData, image: imageUrl, full_image: fullImageUrl };
-
-      if (editingId) {
-        // Actualizar existente
-        const bookDoc = doc(db, "books", editingId);
-        await updateDoc(bookDoc, dataToSave);
-        alert("Libro actualizado correctamente");
-        setEditingId(null);
-      } else {
-        // Crear nuevo
-        await addDoc(booksCollectionRef, dataToSave);
-        alert("Libro creado correctamente");
-      }
-      
-      // Resetear y volver a la lista
-      resetForm();
-      fetchBooks();
-      setView("list");
-    } catch (error) {
-      console.error("Error saving book:", error);
-      alert("Error al guardar el libro");
-    } finally {
-      setUploading(false);
-    }
+    await handleBookSubmit(formData, imageFile, fullImageFile, editingId);
+    resetForm();
+    setView("list");
   };
 
-  // --- BORRAR (Delete) ---
-  const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de querer eliminar este libro?")) {
-      try {
-        const bookDoc = doc(db, "books", id);
-        await deleteDoc(bookDoc);
-        fetchBooks();
-      } catch (error) {
-        console.error("Error deleting book:", error);
-      }
-    }
+  const handleRecognitionFormSubmit = async (e) => {
+    e.preventDefault();
+    await handleSaveRecognition(formRecognitionData, recognitionImageFile, editingRecognitionId);
+    resetRecognitionForm();
+    setView("list");
   };
+
+
 
   // Cargar datos en el formulario para editar
   const handleEdit = (book) => {
@@ -177,50 +98,9 @@ export default function AdminBooks() {
     setView("form"); // Cambiar a vista de formulario
   };
 
-  // --- RECONOCIMIENTOS: FUNCIONES CRUD ---
-  const handleSaveRecognition = async (e) => {
-    e.preventDefault();
-    setUploading(true);
-    try {
-      let imageUrl = formRecognitionData.image;
-      
-      // Subir imagen si existe nueva
-      if (recognitionImageFile) {
-        const imageRef = ref(storage, `recognition_covers/${Date.now()}_${recognitionImageFile.name}`);
-        const snapshot = await uploadBytes(imageRef, recognitionImageFile);
-        imageUrl = await getDownloadURL(snapshot.ref);
-      }
 
-      const dataToSave = { ...formRecognitionData, image: imageUrl };
 
-      if (editingRecognitionId) {
-        const docRef = doc(db, "recognitions", editingRecognitionId);
-        await updateDoc(docRef, dataToSave);
-        alert("Reconocimiento actualizado correctamente");
-      } else {
-        await addDoc(recognitionsCollectionRef, dataToSave);
-        alert("Reconocimiento creado correctamente");
-      }
-      resetRecognitionForm();
-      fetchRecognitions();
-    } catch (error) {
-      console.error("Error saving recognition:", error);
-      alert("Error al guardar el reconocimiento");
-    } finally {
-      setUploading(false);
-    }
-  };
 
-  const handleDeleteRecognition = async (id) => {
-    if (window.confirm("¿Estás seguro de querer eliminar este reconocimiento?")) {
-      try {
-        await deleteDoc(doc(db, "recognitions", id));
-        fetchRecognitions();
-      } catch (error) {
-        console.error("Error deleting recognition:", error);
-      }
-    }
-  };
 
   const handleEditRecognition = (rec) => {
     setEditingRecognitionId(rec.id);
@@ -361,7 +241,7 @@ export default function AdminBooks() {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <form onSubmit={handleBookFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="col-span-2 md:col-span-1">
               <label className="block text-gray-700 font-bold mb-2">Título</label>
               <input
@@ -447,9 +327,9 @@ export default function AdminBooks() {
               <button
                 type="submit"
                 className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
-                disabled={uploading}
+                  disabled={recognitionsUploading}
               >
-                {uploading ? "Subiendo..." : (editingId ? "Actualizar Libro" : "Guardar Libro")}
+                {booksUploading ? "Subiendo..." : (editingId ? "Actualizar Libro" : "Guardar Libro")}
               </button>
               <button
                 type="button"
@@ -466,7 +346,7 @@ export default function AdminBooks() {
         {/* --- VISTA: LISTADO LIBROS (TABLA) --- */}
         {activeTab === 'books' && view === "list" && (
         <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-          {loading ? (
+            {recognitionsLoading ? (
             <div className="p-12 text-center text-gray-500">Cargando catálogo...</div>
           ) : (
             <div className="overflow-x-auto">
@@ -505,7 +385,7 @@ export default function AdminBooks() {
                             <IconEdit />
                           </button>
                           <button
-                            onClick={() => handleDelete(book.id)}
+                            onClick={() => handleBookDelete(book.id)}
                             className="text-red-600 hover:bg-red-50 p-2 rounded transition"
                             title="Eliminar"
                           >
@@ -541,7 +421,7 @@ export default function AdminBooks() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveRecognition} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <form onSubmit={handleRecognitionFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="col-span-2 md:col-span-1">
                 <label className="block text-gray-700 font-bold mb-2">Título del Premio</label>
                 <input
@@ -594,9 +474,9 @@ export default function AdminBooks() {
                 <button
                   type="submit"
                   className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
-                  disabled={uploading}
+                disabled={booksUploading}
                 >
-                  {uploading ? "Guardando..." : (editingRecognitionId ? "Actualizar" : "Guardar")}
+                  {recognitionsUploading ? "Guardando..." : (editingRecognitionId ? "Actualizar" : "Guardar")}
                 </button>
                 <button
                   type="button"
@@ -613,7 +493,7 @@ export default function AdminBooks() {
         {/* --- VISTA: LISTADO RECONOCIMIENTOS (TABLA) --- */}
         {activeTab === 'recognitions' && view === "list" && (
           <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-            {loading ? (
+          {booksLoading ? (
               <div className="p-12 text-center text-gray-500">Cargando reconocimientos...</div>
             ) : (
               <div className="overflow-x-auto">
