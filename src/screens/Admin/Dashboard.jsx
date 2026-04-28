@@ -1,5 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
+import { 
+  collection, 
+  getDocs, 
+  deleteDoc, 
+  doc, 
+  updateDoc,
+  query, 
+  orderBy 
+} from "firebase/firestore";
+import { db } from "../../../firebase";
 import { useBooks } from "../../hooks/useBooks";
 import { useRecognitions } from "../../hooks/useRecognitions";
 
@@ -22,6 +32,12 @@ const IconArrowLeft = () => (
 const IconAward = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/><path d="M21 10.59A8.4 8.4 0 0 0 3 10.59"/></svg>
 );
+const IconCheck = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+);
+const IconMessageSquare = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+);
 const IconMenu = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 );
@@ -33,9 +49,13 @@ export default function AdminBooks() {
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // --- HOOKS PARA DATOS ---
-  const { books, loading: booksLoading, uploading: booksUploading, fetchBooks, handleSubmit: handleBookSubmit, handleDelete: handleBookDelete } = useBooks();
-  const { recognitions, loading: recognitionsLoading, uploading: recognitionsUploading, fetchRecognitions, handleSaveRecognition, handleDeleteRecognition } = useRecognitions();
+   // --- HOOKS PARA DATOS ---
+   const { books, loading: booksLoading, uploading: booksUploading, fetchBooks, handleSubmit: handleBookSubmit, handleDelete: handleBookDelete } = useBooks();
+   const { recognitions, loading: recognitionsLoading, uploading: recognitionsUploading, fetchRecognitions, handleSaveRecognition, handleDeleteRecognition } = useRecognitions();
+
+   // Comentarios
+   const [comments, setComments] = useState([]);
+   const [commentsLoading, setCommentsLoading] = useState(false);
 
   // --- ESTADOS DE FORMULARIOS ---
   const [editingId, setEditingId] = useState(null);
@@ -65,10 +85,56 @@ export default function AdminBooks() {
       issuer: "",
     });
 
-  // --- EFECTOS PARA CARGAR DATOS ---
-  useEffect(() => {
-    fetchBooks();
-  }, [fetchBooks]);
+   // --- EFECTOS PARA CARGAR DATOS ---
+   useEffect(() => {
+     fetchBooks();
+   }, [fetchBooks]);
+
+   // --- FUNCIONES PARA COMENTARIOS ---
+   const fetchComments = useCallback(async () => {
+     setCommentsLoading(true);
+     try {
+       const q = query(
+         collection(db, "comments"),
+         orderBy("createdAt", "desc")
+       );
+       const querySnapshot = await getDocs(q);
+       const commentsData = querySnapshot.docs.map((doc) => ({
+         id: doc.id,
+         ...doc.data(),
+         createdAt: doc.data().createdAt,
+       }));
+       setComments(commentsData);
+     } catch (error) {
+       console.error("Error fetching comments:", error);
+     } finally {
+       setCommentsLoading(false);
+     }
+   }, []);
+
+   const handleApproveComment = async (commentId) => {
+     try {
+       await updateDoc(doc(db, "comments", commentId), {
+         is_approved: true,
+       });
+       // Actualizar localmente
+       setComments(comments.map(c => 
+         c.id === commentId ? { ...c, is_approved: true } : c
+       ));
+     } catch (error) {
+       console.error("Error approving comment:", error);
+     }
+   };
+
+   const handleDeleteComment = async (commentId) => {
+     if (!window.confirm("¿Estás seguro de que deseas eliminar este comentario?")) return;
+     try {
+       await deleteDoc(doc(db, "comments", commentId));
+       setComments(comments.filter(c => c.id !== commentId));
+     } catch (error) {
+       console.error("Error deleting comment:", error);
+     }
+   };
 
 
 
@@ -155,11 +221,14 @@ export default function AdminBooks() {
     setRecognitionImageFile(e.target.files[0]);
   };
 
-  useEffect(() => {
-    if (activeTab === 'recognitions') {
-      fetchRecognitions();
-    }
-  }, [activeTab, fetchRecognitions]);
+   useEffect(() => {
+     if (activeTab === 'recognitions') {
+       fetchRecognitions();
+     }
+     if (activeTab === 'comments') {
+       fetchComments();
+     }
+   }, [activeTab, fetchRecognitions, fetchComments]);
 
 
 
@@ -198,6 +267,13 @@ export default function AdminBooks() {
               <IconAward />
               {sidebarOpen && <span>Reconocimientos</span>}
             </li>
+             <li 
+               className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'comments' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
+               onClick={() => { setActiveTab('comments'); setView('list'); }}
+             >
+              <IconMessageSquare />
+              {sidebarOpen && <span>Comentarios</span>}
+            </li>
 
           </ul>
         </nav>
@@ -210,29 +286,33 @@ export default function AdminBooks() {
       {/* --- CONTENIDO PRINCIPAL --- */}
       <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"} p-8`}>
         
-        {/* HEADER SUPERIOR */}
-        <header className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">
-              {activeTab === 'books' ? "Gestión de Libros" : "Gestión de Reconocimientos"}
-            </h1>
-            <p className="text-gray-500">
-              {activeTab === 'books' ? "Administra el catálogo de obras literarias." : "Administra los premios y menciones recibidos."}
-            </p>
-          </div>
-          {view === "list" && (
-            <button 
-              onClick={() => { 
-                if (activeTab === 'books') resetForm(); 
-                else resetRecognitionForm();
-                setView("form"); 
-              }}
-              className="bg-[#774936] text-white px-4 py-2 rounded shadow hover:bg-[#5d3a2a] transition flex items-center gap-2"
-            >
-              <IconPlus /> {activeTab === 'books' ? "Nuevo Libro" : "Nuevo Reconocimiento"}
-            </button>
-          )}
-        </header>
+         {/* HEADER SUPERIOR */}
+         <header className="flex justify-between items-center mb-8">
+           <div>
+             <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">
+               {activeTab === 'books' ? "Gestión de Libros" : 
+                activeTab === 'recognitions' ? "Gestión de Reconocimientos" :
+                "Moderación de Comentarios"}
+             </h1>
+             <p className="text-gray-500">
+               {activeTab === 'books' ? "Administra el catálogo de obras literarias." : 
+                activeTab === 'recognitions' ? "Administra los premios y menciones recibidos." :
+                "Aprueba o elimina los comentarios del libro de visitas."}
+             </p>
+           </div>
+           {(activeTab === 'books' || activeTab === 'recognitions') && view === "list" && (
+             <button 
+               onClick={() => { 
+                 if (activeTab === 'books') resetForm(); 
+                 else resetRecognitionForm();
+                 setView("form"); 
+               }}
+               className="bg-[#774936] text-white px-4 py-2 rounded shadow hover:bg-[#5d3a2a] transition flex items-center gap-2"
+             >
+               <IconPlus /> {activeTab === 'books' ? "Nuevo Libro" : "Nuevo Reconocimiento"}
+             </button>
+           )}
+         </header>
 
         {/* --- VISTA: FORMULARIO LIBROS --- */}
         {activeTab === 'books' && view === "form" && (
@@ -533,11 +613,95 @@ export default function AdminBooks() {
                   </tbody>
                 </table>
               </div>
-            )}
-          </div>
-        )}
+           )}
+         </div>
+         )}
 
-      </main>
+         {/* --- VISTA: LISTADO COMENTARIOS (TABLA) --- */}
+         {activeTab === 'comments' && view === 'list' && (
+           <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+             {commentsLoading ? (
+               <div className="p-12 text-center text-gray-500">Cargando comentarios...</div>
+             ) : (
+               <div className="overflow-x-auto">
+                 <table className="w-full text-left border-collapse">
+                   <thead>
+                     <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase text-xs tracking-wider">
+                       <th className="p-4">Estado</th>
+                       <th className="p-4">Autor</th>
+                       <th className="p-4">Ubicación</th>
+                       <th className="p-4">Mensaje</th>
+                       <th className="p-4">Fecha</th>
+                       <th className="p-4 text-center">Acciones</th>
+                     </tr>
+                   </thead>
+                   <tbody className="divide-y divide-gray-100">
+                     {comments.map((comment) => (
+                       <tr key={comment.id} className="hover:bg-gray-50 transition">
+                         <td className="p-4">
+                           {comment.is_approved ? (
+                             <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 w-fit">
+                               <IconCheck /> Aprobado
+                             </span>
+                           ) : (
+                             <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 w-fit">
+                               Pendiente
+                             </span>
+                           )}
+                         </td>
+                         <td className="p-4 font-bold text-[#1e3a8a]">
+                           {comment.name || "Anónimo"}
+                         </td>
+                         <td className="p-4 text-gray-600 text-sm">
+                           {comment.location || "-"}
+                         </td>
+                         <td className="p-4 text-gray-600 text-sm max-w-xs truncate">
+                           {comment.message}
+                         </td>
+                         <td className="p-4 text-gray-500 text-sm whitespace-nowrap">
+                           {comment.createdAt?.toDate?.().toLocaleDateString?.('es-AR', {
+                             day: 'numeric',
+                             month: 'short',
+                             year: 'numeric'
+                           }) || 'Fecha no disponible'}
+                         </td>
+                         <td className="p-4 text-center">
+                           <div className="flex justify-center gap-2">
+                             {!comment.is_approved && (
+                               <button
+                                 onClick={() => handleApproveComment(comment.id)}
+                                 className="text-green-600 hover:bg-green-50 p-2 rounded transition"
+                                 title="Aprobar"
+                               >
+                                 <IconCheck />
+                               </button>
+                             )}
+                             <button
+                               onClick={() => handleDeleteComment(comment.id)}
+                               className="text-red-600 hover:bg-red-50 p-2 rounded transition"
+                               title="Eliminar"
+                             >
+                               <IconTrash />
+                             </button>
+                           </div>
+                         </td>
+                       </tr>
+                     ))}
+                     {comments.length === 0 && (
+                       <tr>
+                         <td colSpan="6" className="p-8 text-center text-gray-500">
+                           No hay comentarios registrados.
+                         </td>
+                       </tr>
+                     )}
+                   </tbody>
+                 </table>
+               </div>
+             )}
+           </div>
+         )}
+
+       </main>
     </div>
     </>
   );

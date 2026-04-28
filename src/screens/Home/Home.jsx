@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc, serverTimestamp, query, orderBy, limit, where } from "firebase/firestore";
 import { db } from "../../../firebase"; // Ajusta la ruta si es necesario
 import bgImg from "../../assets/player/apaisada_escritor.jpeg";
 import tanti1 from "../../assets/images/tanti.jpeg";
@@ -11,8 +11,15 @@ export default function Home() {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const [books, setBooks] = useState([]);
+  const [comments, setComments] = useState([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const heroRef = useRef(null);
   const nameRef = useRef(null);
+  const locationRef = useRef(null);
+  const messageRef = useRef(null);
   const scrollRef = useRef(null);
 
   // --- Pre-cargador de imágenes críticas ---
@@ -81,6 +88,92 @@ export default function Home() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isLoaded]);
+
+  // --- Fetch comments from Firestore ---
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const q = query(
+          collection(db, "comments"),
+          orderBy("createdAt", "desc"),
+          limit(50)
+        );
+        const querySnapshot = await getDocs(q);
+        const commentsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt,
+        }));
+        setComments(commentsData);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      } finally {
+        setIsLoadingComments(false);
+      }
+    };
+    fetchComments();
+  }, []);
+
+  // --- Submit comment ---
+  const handleSubmit = async (e) => {
+    if (e) e.preventDefault();
+    const name = nameRef.current?.value?.trim();
+    const location = locationRef.current?.value?.trim();
+    const message = messageRef.current?.value?.trim();
+
+    if (!name || !message) {
+      setSubmitMessage("Por favor, completá tu nombre y mensaje");
+      setSubmitSuccess(false);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitMessage("");
+
+    try {
+      await addDoc(collection(db, "comments"), {
+        name: name,
+        location: location || null,
+        message: message,
+        createdAt: serverTimestamp(),
+      });
+
+      setSubmitMessage("¡Mensaje enviado! Gracias por compartir.");
+      setSubmitSuccess(true);
+      
+      // Clear form
+      nameRef.current.value = "";
+      locationRef.current.value = "";
+      messageRef.current.value = "";
+
+       // Refresh comments (only approved)
+       const q = query(
+         collection(db, "comments"),
+         where("is_approved", "==", true),
+         orderBy("createdAt", "desc"),
+         limit(50)
+       );
+      const querySnapshot = await getDocs(q);
+      const commentsData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt,
+      }));
+      setComments(commentsData);
+
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSubmitMessage("");
+        setSubmitSuccess(false);
+      }, 5000);
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+      setSubmitMessage("Hubo un error al enviar el mensaje. Intentá de nuevo.");
+      setSubmitSuccess(false);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -167,7 +260,7 @@ export default function Home() {
                 </button>
               </Link>
               <Link to={"/contacto"}>
-                <button className="border border-[#774936] text-[#774936] px-8 py-3 rounded-sm hover:bg-[#774936] hover:text-white transition uppercase text-sm tracking-wider">
+                <button className="bg-[#774936] text-white px-8 py-3 rounded-sm hover:bg-[#5d3a2a] transition shadow-lg uppercase text-sm tracking-wider">
                   Contacto
                 </button>
               </Link>
@@ -318,26 +411,106 @@ export default function Home() {
             </div>
           </section>
 
-          {/* 3. NEWSLETTER & CONTACTO (Azul Profundo) */}
-          <section className="py-20 px-6 lg:px-56 bg-[#1e3a8a] text-white text-center">
-            <h3 className={`text-4xl mb-6 ${cursiveFont}`}>
-              Mantengamos la conversación viva
-            </h3>
-            <p className="mb-8 text-blue-100 max-w-xl mx-auto">
-              Suscribite para recibir cuentos inéditos, fechas de presentaciones
-              y reflexiones sobre Tanti y la literatura.
-            </p>
-            <div className="flex flex-col md:flex-row gap-4 justify-center max-w-lg mx-auto mb-12">
-              <input
-                type="email"
-                placeholder="Tu correo electrónico"
-                className="px-4 py-3 rounded text-gray-900 w-full focus:outline-none focus:ring-2 focus:ring-[#774936]"
-              />
-              <button className="bg-[#774936] hover:bg-[#5d3a2a] px-8 py-3 rounded font-bold transition shadow-lg">
-                Suscribirme
-              </button>
-            </div>
-          </section>
+           {/* 3. LIBRO DE VISITAS / COMENTARIOS */}
+           <section className="py-20 px-6 lg:px-56 bg-[#1e3a8a] text-white">
+             <div className="max-w-4xl mx-auto">
+               <h3 className={`text-4xl text-center mb-6 ${cursiveFont}`}>
+                 Dejá tu mensaje
+               </h3>
+               <p className="text-blue-100 text-center mb-12 max-w-xl mx-auto">
+                 Compartí tus impresiones o contame cómo llegaste hasta aquí. 
+                 Cada mensaje es un puente entre nuestras historias.
+               </p>
+
+               {/* Formulario */}
+               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 md:p-8 mb-12">
+                 <div className="grid md:grid-cols-2 gap-4 mb-4">
+                   <input
+                     type="text"
+                     ref={nameRef}
+                     placeholder="Tu nombre o alias"
+                     className="px-4 py-3 rounded bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#774936]"
+                   />
+                   <input
+                     type="text"
+                     ref={locationRef}
+                     placeholder="Tu ciudad (opcional)"
+                     className="px-4 py-3 rounded bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#774936]"
+                   />
+                 </div>
+                 <textarea
+                   ref={messageRef}
+                   placeholder="Escribí tu mensaje aquí..."
+                   rows="3"
+                   className="w-full px-4 py-3 rounded bg-white/90 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#774936] resize-none mb-4"
+                 ></textarea>
+                 <div className="flex flex-col sm:flex-row gap-3 justify-between items-center">
+                   <p className="text-sm text-blue-200">
+                     Los mensajes son moderados antes de publicarse.
+                   </p>
+                   <button
+                     onClick={handleSubmit}
+                     disabled={isSubmitting}
+                     className="bg-[#774936] hover:bg-[#5d3a2a] text-white px-8 py-3 rounded font-bold transition shadow-lg whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                   >
+                     {isSubmitting ? "Enviando..." : "Dejar mensaje"}
+                   </button>
+                 </div>
+                 {submitMessage && (
+                   <p className={`text-center mt-4 font-medium ${
+                     submitSuccess ? "text-green-300" : "text-red-300"
+                   }`}>
+                     {submitMessage}
+                   </p>
+                 )}
+               </div>
+
+               {/* Mensajes recientes */}
+               <div className="space-y-4">
+                 <h4 className="text-xl font-semibold text-center mb-6">
+                   Mensajes recientes
+                   {comments.length > 0 && (
+                     <span className="text-blue-300 ml-2">({comments.length})</span>
+                   )}
+                 </h4>
+                 {isLoadingComments ? (
+                   <p className="text-center text-blue-200 py-8">Cargando mensajes...</p>
+                 ) : comments.length === 0 ? (
+                   <p className="text-center text-blue-200 py-8">
+                     Todavía no hay mensajes. ¡Sé el primero en dejar uno!
+                   </p>
+                 ) : (
+                   <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                     {comments.map((comment) => (
+                       <div
+                         key={comment.id}
+                         className="bg-white/5 rounded-lg p-4 border border-white/10"
+                       >
+                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                           <span className="font-semibold text-[#774936]">
+                             {comment.name || "Anónimo"}
+                           </span>
+                           {comment.location && (
+                             <span className="text-sm text-blue-300">
+                               - {comment.location}
+                             </span>
+                           )}
+                           <span className="text-xs text-blue-300 sm:ml-auto">
+                             {comment.createdAt?.toDate?.().toLocaleDateString?.('es-AR', {
+                               day: 'numeric',
+                               month: 'short',
+                               year: 'numeric'
+                             })}
+                           </span>
+                         </div>
+                         <p className="text-blue-100 leading-relaxed">{comment.message}</p>
+                       </div>
+                     ))}
+                   </div>
+                 )}
+               </div>
+             </div>
+           </section>
         </div>
       </scroll-container>
     </div>

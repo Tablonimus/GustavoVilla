@@ -80,6 +80,7 @@ export default function Books() {
             >
               {/* Contenedor de Imagen */}
               <div className="w-full md:w-2/5 h-64 md:h-96 relative overflow-hidden bg-black/20">
+              {console.log(book)}
                 <img
                   src={book.full_image}
                   alt={book.title}
