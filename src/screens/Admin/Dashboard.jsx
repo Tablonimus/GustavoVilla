@@ -12,6 +12,9 @@ import {
 import { db } from "../../../firebase";
 import { useBooks } from "../../hooks/useBooks";
 import { useRecognitions } from "../../hooks/useRecognitions";
+import { useBanners } from "../../hooks/useBanners";
+import { useEvents } from "../../hooks/useEvents";
+import { useBlog } from "../../hooks/useBlog";
 
 // --- ICONOS SVG (Componentes simples para no depender de librerías externas) ---
 const IconBook = () => (
@@ -38,20 +41,32 @@ const IconCheck = () => (
 const IconMessageSquare = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
 );
+const IconImage = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+);
+const IconCamera = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h1.586a1 1 0 0 1 .707.293l.707.707A1 1 0 0 0 13.414 11H15m-6 4h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+);
+const IconBookOpen = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/><path d="M6 8h2"/><path d="M6 12h2"/><path d="M16 8h2"/><path d="M16 12h2"/><path d="M12 8v8"/></svg>
+);
 const IconMenu = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
 );
 
 export default function AdminBooks() {
   // --- ESTADOS DE NAVEGACIÓN ---
-  const [activeTab, setActiveTab] = useState("books"); // 'books', 'settings', etc.
+  const [activeTab, setActiveTab] = useState("books"); // 'books', 'recognitions', 'comments', 'banners'
   const [view, setView] = useState("list"); // 'list' | 'form'
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
    // --- HOOKS PARA DATOS ---
-   const { books, loading: booksLoading, uploading: booksUploading, fetchBooks, handleSubmit: handleBookSubmit, handleDelete: handleBookDelete } = useBooks();
-   const { recognitions, loading: recognitionsLoading, uploading: recognitionsUploading, fetchRecognitions, handleSaveRecognition, handleDeleteRecognition } = useRecognitions();
+    const { books, loading: booksLoading, uploading: booksUploading, fetchBooks, handleSubmit: handleBookSubmit, handleDelete: handleBookDelete } = useBooks();
+    const { recognitions, loading: recognitionsLoading, uploading: recognitionsUploading, fetchRecognitions, handleSaveRecognition, handleDeleteRecognition } = useRecognitions();
+    const { banners, loading: bannersLoading, uploading: bannersUploading, fetchBanners, handleSubmit: handleBannerSubmit, handleDelete: handleBannerDelete } = useBanners();
+    const { events, loading: eventsLoading, uploading: eventsUploading, fetchEvents, handleSubmit: handleEventSubmit, handleDelete: handleEventDelete } = useEvents();
+    const { blogPosts, loading: blogLoading, uploading: blogUploading, fetchBlogPosts, handleSubmit: handleBlogSubmit, handleDelete: handleBlogDelete } = useBlog();
 
    // Comentarios
    const [comments, setComments] = useState([]);
@@ -59,10 +74,17 @@ export default function AdminBooks() {
 
   // --- ESTADOS DE FORMULARIOS ---
   const [editingId, setEditingId] = useState(null);
-  const [imageFile, setImageFile] = useState(null); // Archivo de portada
-  const [fullImageFile, setFullImageFile] = useState(null); // Archivo de fondo
+   const [imageFile, setImageFile] = useState(null); // Archivo de portada
+   const [fullImageFile, setFullImageFile] = useState(null); // Archivo de fondo
+   const [pdfFile, setPdfFile] = useState(null); // Archivo PDF de fragmento
   const [recognitionImageFile, setRecognitionImageFile] = useState(null); // Archivo de reconocimiento
-  const [editingRecognitionId, setEditingRecognitionId] = useState(null)
+   const [editingRecognitionId, setEditingRecognitionId] = useState(null);
+   const [bannerImageFile, setBannerImageFile] = useState(null);
+   const [editingBannerId, setEditingBannerId] = useState(null);
+   const [eventImageFile, setEventImageFile] = useState(null);
+   const [editingEventId, setEditingEventId] = useState(null);
+   const [blogImageFile, setBlogImageFile] = useState(null);
+   const [editingBlogId, setEditingBlogId] = useState(null);
 
   // Estado inicial del formulario limpio
   const initialFormState = {
@@ -71,6 +93,7 @@ export default function AdminBooks() {
     full_description: "",
     image: "",
     full_image: "",
+    pdf_fragment: "",
     buttonText: "Ver Mas",
     isPreorder: false,
   };
@@ -83,6 +106,32 @@ export default function AdminBooks() {
       description: "",
       image: "",
       issuer: "",
+    });
+
+    // Estado del formulario de banner
+    const [formBannerData, setFormBannerData] = useState({
+      title: "",
+      description: "",
+      image: "",
+      eventDate: "",
+      isActive: true,
+    });
+
+    // Estado del formulario de evento
+    const [formEventData, setFormEventData] = useState({
+      title: "",
+      description: "",
+      image: "",
+      epigraph: "",
+    });
+
+    // Estado del formulario del blog
+    const [formBlogData, setFormBlogData] = useState({
+      title: "",
+      excerpt: "",
+      content: "",
+      image: "",
+      category: "",
     });
 
    // --- EFECTOS PARA CARGAR DATOS ---
@@ -147,7 +196,7 @@ export default function AdminBooks() {
   // --- MANEJADORES PARA LIBROS ---
   const handleBookFormSubmit = async (e) => {
     e.preventDefault();
-    await handleBookSubmit(formData, imageFile, fullImageFile, editingId);
+    await handleBookSubmit(formData, imageFile, fullImageFile, pdfFile, editingId);
     resetForm();
     setView("list");
   };
@@ -167,6 +216,7 @@ export default function AdminBooks() {
     setFormData(book);
     setImageFile(null);
     setFullImageFile(null);
+    setPdfFile(null);
     setView("form"); // Cambiar a vista de formulario
   };
 
@@ -186,6 +236,7 @@ export default function AdminBooks() {
     setEditingId(null);
     setImageFile(null);
     setFullImageFile(null);
+    setPdfFile(null);
     setView("list");
   };
 
@@ -198,6 +249,44 @@ export default function AdminBooks() {
     });
     setEditingRecognitionId(null);
     setRecognitionImageFile(null);
+    setView("list");
+  };
+
+  const resetBannerForm = () => {
+    setFormBannerData({
+      title: "",
+      description: "",
+      image: "",
+      eventDate: "",
+      isActive: true,
+    });
+    setEditingBannerId(null);
+    setBannerImageFile(null);
+    setView("list");
+  };
+
+  const resetEventForm = () => {
+    setFormEventData({
+      title: "",
+      description: "",
+      image: "",
+      epigraph: "",
+    });
+    setEditingEventId(null);
+    setEventImageFile(null);
+    setView("list");
+  };
+
+  const resetBlogForm = () => {
+    setFormBlogData({
+      title: "",
+      excerpt: "",
+      content: "",
+      image: "",
+      category: "",
+    });
+    setEditingBlogId(null);
+    setBlogImageFile(null);
     setView("list");
   };
 
@@ -226,7 +315,79 @@ export default function AdminBooks() {
     setRecognitionImageFile(e.target.files[0]);
   };
 
-   useEffect(() => {
+  const handleBannerChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormBannerData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleBannerFileChange = (e) => {
+    setBannerImageFile(e.target.files[0]);
+  };
+
+  const handleBannerFormSubmit = async (e) => {
+    e.preventDefault();
+    await handleBannerSubmit(formBannerData, bannerImageFile, editingBannerId);
+    resetBannerForm();
+    setView("list");
+  };
+
+  const handleEditBanner = (banner) => {
+    setEditingBannerId(banner.id);
+    setFormBannerData(banner);
+    setBannerImageFile(null);
+    setView("form");
+  };
+
+  const handleEventChange = (e) => {
+    const { name, value } = e.target;
+    setFormEventData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleEventFileChange = (e) => {
+    setEventImageFile(e.target.files[0]);
+  };
+
+  const handleEventFormSubmit = async (e) => {
+    e.preventDefault();
+    await handleEventSubmit(formEventData, eventImageFile, editingEventId);
+    resetEventForm();
+    setView("list");
+  };
+
+  const handleEditEvent = (event) => {
+    setEditingEventId(event.id);
+    setFormEventData(event);
+    setEventImageFile(null);
+    setView("form");
+  };
+
+  const handleBlogChange = (e) => {
+    const { name, value } = e.target;
+    setFormBlogData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleBlogFileChange = (e) => {
+    setBlogImageFile(e.target.files[0]);
+  };
+
+  const handleBlogFormSubmit = async (e) => {
+    e.preventDefault();
+    await handleBlogSubmit(formBlogData, blogImageFile, editingBlogId);
+    resetBlogForm();
+    setView("list");
+  };
+
+  const handleEditBlog = (blogPost) => {
+    setEditingBlogId(blogPost.id);
+    setFormBlogData(blogPost);
+    setBlogImageFile(null);
+    setView("form");
+  };
+
+    useEffect(() => {
       if (activeTab === 'books') {
         fetchBooks();
       }
@@ -236,7 +397,16 @@ export default function AdminBooks() {
       if (activeTab === 'comments') {
         fetchComments();
       }
-    }, [activeTab, fetchBooks, fetchRecognitions, fetchComments]);
+      if (activeTab === 'banners') {
+        fetchBanners();
+      }
+      if (activeTab === 'events') {
+        fetchEvents();
+      }
+      if (activeTab === 'blog') {
+        fetchBlogPosts();
+      }
+    }, [activeTab, fetchBooks, fetchRecognitions, fetchComments, fetchBanners, fetchEvents, fetchBlogPosts]);
 
 
 
@@ -275,15 +445,36 @@ export default function AdminBooks() {
               <IconAward />
               {sidebarOpen && <span>Reconocimientos</span>}
             </li>
-             <li 
+             <li
                className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'comments' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
                onClick={() => { setActiveTab('comments'); setView('list'); }}
              >
-              <IconMessageSquare />
-              {sidebarOpen && <span>Comentarios</span>}
-            </li>
+               <IconMessageSquare />
+               {sidebarOpen && <span>Comentarios</span>}
+             </li>
+             <li
+               className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'banners' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
+               onClick={() => { setActiveTab('banners'); setView('list'); }}
+             >
+               <IconImage />
+               {sidebarOpen && <span>Banner Principal</span>}
+             </li>
+             <li
+               className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'events' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
+               onClick={() => { setActiveTab('events'); setView('list'); }}
+             >
+               <IconCamera />
+               {sidebarOpen && <span>Eventos</span>}
+             </li>
+             <li
+               className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'blog' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
+               onClick={() => { setActiveTab('blog'); setView('list'); }}
+             >
+               <IconBookOpen />
+               {sidebarOpen && <span>Blog</span>}
+             </li>
 
-          </ul>
+           </ul>
         </nav>
         
         <div className="p-6 border-t border-blue-800 text-sm text-blue-300">
@@ -297,29 +488,38 @@ export default function AdminBooks() {
          {/* HEADER SUPERIOR */}
          <header className="flex justify-between items-center mb-8">
            <div>
-             <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">
-               {activeTab === 'books' ? "Gestión de Libros" : 
-                activeTab === 'recognitions' ? "Gestión de Reconocimientos" :
-                "Moderación de Comentarios"}
-             </h1>
-             <p className="text-gray-500">
-               {activeTab === 'books' ? "Administra el catálogo de obras literarias." : 
-                activeTab === 'recognitions' ? "Administra los premios y menciones recibidos." :
-                "Aprueba o elimina los comentarios del libro de visitas."}
-             </p>
+              <h1 className="text-3xl font-bold text-[#1e3a8a] font-serif">
+                {activeTab === 'books' ? "Gestión de Libros" :
+                 activeTab === 'recognitions' ? "Gestión de Reconocimientos" :
+                 activeTab === 'comments' ? "Moderación de Comentarios" :
+                 activeTab === 'banners' ? "Gestión de Banner Principal" :
+                 activeTab === 'events' ? "Gestión de Eventos" :
+                 "Gestión del Blog"}
+              </h1>
+              <p className="text-gray-500">
+                {activeTab === 'books' ? "Administra el catálogo de obras literarias." :
+                 activeTab === 'recognitions' ? "Administra los premios y menciones recibidos." :
+                 activeTab === 'comments' ? "Aprueba o elimina los comentarios del libro de visitas." :
+                 activeTab === 'banners' ? "Administra los banners principales para eventos próximos." :
+                 activeTab === 'events' ? "Administra las fotos y eventos para la galería." :
+                 "Comparte tus ideas, reflexiones y novedades literarias."}
+              </p>
            </div>
-           {(activeTab === 'books' || activeTab === 'recognitions') && view === "list" && (
-             <button 
-               onClick={() => { 
-                 if (activeTab === 'books') resetForm(); 
-                 else resetRecognitionForm();
-                 setView("form"); 
-               }}
-               className="bg-[#774936] text-white px-4 py-2 rounded shadow hover:bg-[#5d3a2a] transition flex items-center gap-2"
-             >
-               <IconPlus /> {activeTab === 'books' ? "Nuevo Libro" : "Nuevo Reconocimiento"}
-             </button>
-           )}
+            {(activeTab === 'books' || activeTab === 'recognitions' || activeTab === 'banners' || activeTab === 'events' || activeTab === 'blog') && view === "list" && (
+              <button
+                onClick={() => {
+                  if (activeTab === 'books') resetForm();
+                  else if (activeTab === 'recognitions') resetRecognitionForm();
+                  else if (activeTab === 'banners') resetBannerForm();
+                  else if (activeTab === 'events') resetEventForm();
+                  else resetBlogForm();
+                  setView("form");
+                }}
+                className="bg-[#774936] text-white px-4 py-2 rounded shadow hover:bg-[#5d3a2a] transition flex items-center gap-2"
+              >
+                <IconPlus /> {activeTab === 'books' ? "Nuevo Libro" : activeTab === 'recognitions' ? "Nuevo Reconocimiento" : activeTab === 'banners' ? "Nuevo Banner" : activeTab === 'events' ? "Nuevo Evento" : "Nueva Entrada"}
+              </button>
+            )}
          </header>
 
         {/* --- VISTA: FORMULARIO LIBROS --- */}
@@ -405,6 +605,29 @@ export default function AdminBooks() {
               />
             </div>
 
+            <div className="col-span-2">
+              <label className="block text-gray-700 font-bold mb-2">PDF de Fragmento del Libro</label>
+              {formData.pdf_fragment && (
+                <div className="mb-2">
+                  <a
+                    href={formData.pdf_fragment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 underline text-sm"
+                  >
+                    Ver PDF actual
+                  </a>
+                </div>
+              )}
+              <input
+                type="file"
+                accept=".pdf"
+                onChange={(e) => setPdfFile(e.target.files[0])}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+              />
+              <p className="text-sm text-gray-500 mt-1">Sube un PDF con fragmentos del libro para que los lectores puedan leer sin salir del sitio.</p>
+            </div>
+
             <div className="col-span-2 flex items-center gap-2">
               <input
                 type="checkbox"
@@ -433,7 +656,284 @@ export default function AdminBooks() {
               </button>
             </div>
           </form>
-        </div>
+          </div>
+        )}
+
+        {/* --- VISTA: FORMULARIO BANNERS --- */}
+        {activeTab === 'banners' && view === "form" && (
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#774936] mb-4">
+                {editingBannerId ? "Editar Banner" : "Agregar Nuevo Banner"}
+              </h2>
+              <button onClick={resetBannerForm} className="text-gray-500 hover:text-[#1e3a8a] flex items-center gap-1">
+                <IconArrowLeft /> Volver a la lista
+              </button>
+            </div>
+
+            <form onSubmit={handleBannerFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Título del Evento</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formBannerData.title}
+                  onChange={handleBannerChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Fecha del Evento</label>
+                <input
+                  type="date"
+                  name="eventDate"
+                  value={formBannerData.eventDate}
+                  onChange={handleBannerChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Descripción</label>
+                <textarea
+                  name="description"
+                  value={formBannerData.description}
+                  onChange={handleBannerChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  rows="3"
+                  placeholder="Detalles del evento..."
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Imagen del Banner</label>
+                {formBannerData.image && <img src={formBannerData.image} alt="Banner actual" className="h-32 mb-2 rounded object-cover" />}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBannerFileChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required={!editingBannerId}
+                />
+              </div>
+
+              <div className="col-span-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isActive"
+                  checked={formBannerData.isActive}
+                  onChange={handleBannerChange}
+                  className="w-5 h-5 text-[#1e3a8a]"
+                />
+                <label className="text-gray-700 font-bold">Banner activo (visible en el sitio)</label>
+              </div>
+
+              <div className="col-span-2 flex gap-4 mt-4">
+                <button
+                  type="submit"
+                  className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
+                  disabled={bannersUploading}
+                >
+                  {bannersUploading ? "Subiendo..." : (editingBannerId ? "Actualizar Banner" : "Guardar Banner")}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetBannerForm}
+                  className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition font-bold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* --- VISTA: FORMULARIO EVENTOS --- */}
+        {activeTab === 'events' && view === "form" && (
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#774936] mb-4">
+                {editingEventId ? "Editar Evento" : "Agregar Nuevo Evento"}
+              </h2>
+              <button onClick={resetEventForm} className="text-gray-500 hover:text-[#1e3a8a] flex items-center gap-1">
+                <IconArrowLeft /> Volver a la lista
+              </button>
+            </div>
+
+            <form onSubmit={handleEventFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Título del Evento</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formEventData.title}
+                  onChange={handleEventChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Epígrafe</label>
+                <input
+                  type="text"
+                  name="epigraph"
+                  value={formEventData.epigraph}
+                  onChange={handleEventChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  placeholder="Una frase corta descriptiva..."
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Descripción</label>
+                <textarea
+                  name="description"
+                  value={formEventData.description}
+                  onChange={handleEventChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  rows="4"
+                  placeholder="Describe el evento..."
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Imagen del Evento</label>
+                {formEventData.image && <img src={formEventData.image} alt="Evento actual" className="h-32 mb-2 rounded object-cover" />}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEventFileChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required={!editingEventId}
+                />
+              </div>
+
+              <div className="col-span-2 flex gap-4 mt-4">
+                <button
+                  type="submit"
+                  className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
+                  disabled={eventsUploading}
+                >
+                  {eventsUploading ? "Subiendo..." : (editingEventId ? "Actualizar Evento" : "Guardar Evento")}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetEventForm}
+                  className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition font-bold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* --- VISTA: FORMULARIO BLOG --- */}
+        {activeTab === 'blog' && view === "form" && (
+          <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 animate-fade-in">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-[#774936] mb-4">
+                {editingBlogId ? "Editar Entrada del Blog" : "Nueva Entrada del Blog"}
+              </h2>
+              <button onClick={resetBlogForm} className="text-gray-500 hover:text-[#1e3a8a] flex items-center gap-1">
+                <IconArrowLeft /> Volver a la lista
+              </button>
+            </div>
+
+            <form onSubmit={handleBlogFormSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Título</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formBlogData.title}
+                  onChange={handleBlogChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required
+                />
+              </div>
+
+              <div className="col-span-2 md:col-span-1">
+                <label className="block text-gray-700 font-bold mb-2">Categoría</label>
+                <select
+                  name="category"
+                  value={formBlogData.category}
+                  onChange={handleBlogChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                >
+                  <option value="">Seleccionar categoría...</option>
+                  <option value="reflexiones">Reflexiones</option>
+                  <option value="literatura">Literatura</option>
+                  <option value="escritura">Escritura</option>
+                  <option value="vida">Vida</option>
+                  <option value="novedades">Novedades</option>
+                  <option value="otros">Otros</option>
+                </select>
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Extracto (Resumen corto)</label>
+                <textarea
+                  name="excerpt"
+                  value={formBlogData.excerpt}
+                  onChange={handleBlogChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  rows="2"
+                  placeholder="Un resumen breve de la entrada..."
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Contenido</label>
+                <textarea
+                  name="content"
+                  value={formBlogData.content}
+                  onChange={handleBlogChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  rows="8"
+                  placeholder="Escribe el contenido de tu entrada del blog..."
+                  required
+                />
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-gray-700 font-bold mb-2">Imagen Destacada</label>
+                {formBlogData.image && <img src={formBlogData.image} alt="Blog actual" className="h-32 mb-2 rounded object-cover" />}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBlogFileChange}
+                  className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#1e3a8a]"
+                  required={!editingBlogId}
+                />
+                <p className="text-sm text-gray-500 mt-1">Imagen que representará tu entrada del blog</p>
+              </div>
+
+              <div className="col-span-2 flex gap-4 mt-4">
+                <button
+                  type="submit"
+                  className="bg-[#1e3a8a] text-white px-6 py-2 rounded hover:bg-blue-900 transition font-bold"
+                  disabled={blogUploading}
+                >
+                  {blogUploading ? "Guardando..." : (editingBlogId ? "Actualizar Entrada" : "Publicar Entrada")}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetBlogForm}
+                  className="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600 transition font-bold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
         )}
 
         {/* --- VISTA: LISTADO LIBROS (TABLA) --- */}
@@ -706,11 +1206,203 @@ export default function AdminBooks() {
                  </table>
                </div>
              )}
-           </div>
-         )}
+            </div>
+          )}
 
-       </main>
+          {/* --- VISTA: LISTADO BANNERS (TABLA) --- */}
+          {activeTab === 'banners' && view === "list" && (
+            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+              {bannersLoading ? (
+                <div className="p-12 text-center text-gray-500">Cargando banners...</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase text-xs tracking-wider">
+                        <th className="p-4">Imagen</th>
+                        <th className="p-4">Título</th>
+                        <th className="p-4">Fecha del Evento</th>
+                        <th className="p-4">Estado</th>
+                        <th className="p-4 text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {banners.map((banner) => (
+                        <tr key={banner.id} className="hover:bg-gray-50 transition">
+                          <td className="p-4">
+                            <img src={banner.image} alt={banner.title} className="w-16 h-12 object-cover rounded shadow-sm" />
+                          </td>
+                          <td className="p-4 font-bold text-[#1e3a8a]">{banner.title}</td>
+                          <td className="p-4 text-gray-600">
+                            {banner.eventDate ? new Date(banner.eventDate).toLocaleDateString('es-AR') : 'Sin fecha'}
+                          </td>
+                          <td className="p-4 text-center">
+                            {banner.isActive ? (
+                              <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">Activo</span>
+                            ) : (
+                              <span className="bg-gray-100 text-gray-800 text-xs font-bold px-2 py-1 rounded-full">Inactivo</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleEditBanner(banner)}
+                                className="text-blue-600 hover:bg-blue-50 p-2 rounded transition"
+                                title="Editar"
+                              >
+                                <IconEdit />
+                              </button>
+                              <button
+                                onClick={() => handleBannerDelete(banner.id)}
+                                className="text-red-600 hover:bg-red-50 p-2 rounded transition"
+                                title="Eliminar"
+                              >
+                                <IconTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {banners.length === 0 && (
+                        <tr>
+                          <td colSpan="5" className="p-8 text-center text-gray-500">
+                            No hay banners registrados. ¡Agrega uno nuevo!
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* --- VISTA: LISTADO EVENTOS (TABLA) --- */}
+          {activeTab === 'events' && view === "list" && (
+            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+              {eventsLoading ? (
+                <div className="p-12 text-center text-gray-500">Cargando eventos...</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase text-xs tracking-wider">
+                        <th className="p-4">Imagen</th>
+                        <th className="p-4">Título</th>
+                        <th className="p-4">Epígrafe</th>
+                        <th className="p-4 text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {events.map((event) => (
+                        <tr key={event.id} className="hover:bg-gray-50 transition">
+                          <td className="p-4">
+                            <img src={event.image} alt={event.title} className="w-16 h-12 object-cover rounded shadow-sm" />
+                          </td>
+                          <td className="p-4 font-bold text-[#1e3a8a]">{event.title}</td>
+                          <td className="p-4 text-gray-600 italic">{event.epigraph || "-"}</td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleEditEvent(event)}
+                                className="text-blue-600 hover:bg-blue-50 p-2 rounded transition"
+                                title="Editar"
+                              >
+                                <IconEdit />
+                              </button>
+                              <button
+                                onClick={() => handleEventDelete(event.id)}
+                                className="text-red-600 hover:bg-red-50 p-2 rounded transition"
+                                title="Eliminar"
+                              >
+                                <IconTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {events.length === 0 && (
+                        <tr>
+                          <td colSpan="4" className="p-8 text-center text-gray-500">
+                            No hay eventos registrados. ¡Agrega uno nuevo!
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* --- VISTA: LISTADO BLOG (TABLA) --- */}
+          {activeTab === 'blog' && view === "list" && (
+            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
+              {blogLoading ? (
+                <div className="p-12 text-center text-gray-500">Cargando entradas del blog...</div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-700 border-b border-gray-200 uppercase text-xs tracking-wider">
+                        <th className="p-4">Imagen</th>
+                        <th className="p-4">Título</th>
+                        <th className="p-4">Categoría</th>
+                        <th className="p-4">Fecha</th>
+                        <th className="p-4 text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {blogPosts.map((post) => (
+                        <tr key={post.id} className="hover:bg-gray-50 transition">
+                          <td className="p-4">
+                            <img src={post.image} alt={post.title} className="w-16 h-12 object-cover rounded shadow-sm" />
+                          </td>
+                          <td className="p-4 font-bold text-[#1e3a8a]">{post.title}</td>
+                          <td className="p-4 text-gray-600 capitalize">{post.category || "Sin categoría"}</td>
+                          <td className="p-4 text-gray-600 text-sm">
+                            {post.createdAt?.toDate?.().toLocaleDateString('es-AR', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            }) || 'Sin fecha'}
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => handleEditBlog(post)}
+                                className="text-blue-600 hover:bg-blue-50 p-2 rounded transition"
+                                title="Editar"
+                              >
+                                <IconEdit />
+                              </button>
+                              <button
+                                onClick={() => handleBlogDelete(post.id)}
+                                className="text-red-600 hover:bg-red-50 p-2 rounded transition"
+                                title="Eliminar"
+                              >
+                                <IconTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {blogPosts.length === 0 && (
+                        <tr>
+                          <td colSpan="5" className="p-8 text-center text-gray-500">
+                            No hay entradas del blog. ¡Crea la primera!
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+        </main>
     </div>
-    </>
-  );
-}
+     </>
+   );
+ }

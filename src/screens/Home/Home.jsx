@@ -12,6 +12,7 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [books, setBooks] = useState([]);
   const [comments, setComments] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [isLoadingComments, setIsLoadingComments] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState("");
@@ -57,6 +58,28 @@ export default function Home() {
       }
     };
     fetchBooks();
+  }, []);
+
+  // --- Fetch de banners activos desde Firestore ---
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const q = query(
+          collection(db, "banners"),
+          where("isActive", "==", true),
+          orderBy("eventDate", "asc")
+        );
+        const querySnapshot = await getDocs(q);
+        const bannersData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setBanners(bannersData);
+      } catch (error) {
+        console.error("Error fetching banners:", error);
+      }
+    };
+    fetchBanners();
   }, []);
 
   // Importar fuente cursiva dinámicamente (opcional, o poner en index.html)
@@ -220,6 +243,37 @@ export default function Home() {
           })}
         </script>
       </Helmet>
+
+      {/* --- BANNERS DE EVENTOS --- */}
+      {banners.length > 0 && (
+        <div className="relative bg-gradient-to-r from-[#1e3a8a] to-[#774936] text-white py-3 overflow-hidden shadow-lg pt-16">
+          <div className="flex animate-scroll">
+            {banners.map((banner) => (
+              <div key={banner.id} className="flex-shrink-0 mx-8 flex items-center gap-6 min-w-max">
+                <img
+                  src={banner.image}
+                  alt={banner.title}
+                  className="h-12 w-20 object-cover rounded shadow-md"
+                />
+                <div className="flex flex-col">
+                  <h3 className="text-base font-bold font-serif">{banner.title}</h3>
+                  <p className="text-xs opacity-90">
+                    {banner.eventDate ? new Date(banner.eventDate).toLocaleDateString('es-AR', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    }) : ''}
+                  </p>
+                  {banner.description && (
+                    <p className="text-xs opacity-75 mt-1 max-w-sm line-clamp-2">{banner.description}</p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={`background-fix app-container ${isLoaded ? "loaded" : ""}`}>
       {/*PORTADA PRINCIPAL */}
       <div
@@ -254,14 +308,21 @@ export default function Home() {
             >
               “Historias que unen memoria, <br /> identidad y emoción.”
             </p>
-            <div className="flex gap-6 justify-start">
-              <Link to={"/libros"}>
-                <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
-                  Conocé mis libros
-                </button>
-              </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to={"/libros"}>
+                  <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
+                    Conocé mis libros
+                  </button>
+                </Link>
+                <Link to={"/blog"}>
+                  <button className="bg-[#774936] text-white px-8 py-3 rounded-sm hover:bg-[#5d3a2a] transition shadow-lg uppercase text-sm tracking-wider">
+                    Lee mi blog
+                  </button>
+                </Link>
+              </div>
               <Link to={"/contacto"}>
-                <button className="bg-[#774936] text-white px-8 py-3 rounded-sm hover:bg-[#5d3a2a] transition shadow-lg uppercase text-sm tracking-wider">
+                <button className="border-2 border-white text-white px-8 py-3 rounded-sm hover:bg-white hover:text-[#1e3a8a] transition shadow-lg uppercase text-sm tracking-wider">
                   Contacto
                 </button>
               </Link>
@@ -412,7 +473,25 @@ export default function Home() {
             </div>
           </section>
 
-           {/* 3. LIBRO DE VISITAS / COMENTARIOS */}
+           {/* 2.5. BLOG / REFLEXIONES */}
+          <section className="py-20 px-6 lg:px-56 bg-[#1e3a8a] text-white">
+            <div className="max-w-4xl mx-auto text-center">
+              <h3 className={`text-4xl text-center mb-6 ${cursiveFont}`}>
+                Reflexiones y Pensamientos
+              </h3>
+              <p className="text-blue-100 text-center mb-8 max-w-xl mx-auto">
+                Un espacio personal donde comparto ideas, reflexiones literarias y novedades.
+                Cada entrada es una ventana a mi mundo creativo.
+              </p>
+              <Link to="/blog">
+                <button className="bg-[#774936] hover:bg-[#5d3a2a] text-white px-8 py-3 rounded font-bold transition shadow-lg">
+                  Explorar el Blog
+                </button>
+              </Link>
+            </div>
+          </section>
+
+          {/* 4. LIBRO DE VISITAS / COMENTARIOS */}
            <section className="py-20 px-6 lg:px-56 bg-[#1e3a8a] text-white">
              <div className="max-w-4xl mx-auto">
                <h3 className={`text-4xl text-center mb-6 ${cursiveFont}`}>

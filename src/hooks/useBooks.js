@@ -21,12 +21,13 @@ export const useBooks = () => {
     setLoading(false);
   }, [booksCollectionRef]);
 
-  const handleSubmit = useCallback(async (formData, imageFile, fullImageFile, editingId) => {
+  const handleSubmit = useCallback(async (formData, imageFile, fullImageFile, pdfFile, editingId) => {
     setUploading(true);
 
     try {
       let imageUrl = formData.image;
       let fullImageUrl = formData.full_image;
+      let pdfUrl = formData.pdf_fragment;
 
       // 1. Subir imagen de portada si se seleccionó una nueva
       if (imageFile) {
@@ -42,7 +43,24 @@ export const useBooks = () => {
         fullImageUrl = await getDownloadURL(snapshot.ref);
       }
 
-      const dataToSave = { ...formData, image: imageUrl, full_image: fullImageUrl };
+      // 3. Subir PDF de fragmento si se seleccionó uno nuevo
+      if (pdfFile) {
+        const pdfRef = ref(storage, `book_fragments/${Date.now()}_${pdfFile.name}`);
+        const snapshot = await uploadBytes(pdfRef, pdfFile);
+        pdfUrl = await getDownloadURL(snapshot.ref);
+      }
+
+      // Preparar datos para guardar
+      const dataToSave = {
+        ...formData,
+        image: imageUrl,
+        full_image: fullImageUrl
+      };
+
+      // Solo incluir pdf_fragment si tiene un valor válido (no undefined)
+      if (pdfUrl !== undefined) {
+        dataToSave.pdf_fragment = pdfUrl;
+      }
 
       if (editingId) {
         // Actualizar existente

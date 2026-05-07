@@ -1,0 +1,133 @@
+/* Estilos para la Galería */
+
+/* Animación de fade-in para elementos */
+@keyframes fade-in-gallery {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-gallery {
+  animation: fade-in-gallery 0.6s ease-out;
+}
+
+/* Estilos para el modal */
+.modal-overlay {
+  backdrop-filter: blur(4px);
+}
+
+/* Estilos para el overlay de texto en las imágenes */
+.image-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(44, 26, 18, 0.9) 0%,
+    rgba(44, 26, 18, 0.6) 50%,
+    transparent 100%
+  );
+}
+
+/* Estilos específicos para el overlay del carrousel principal */
+.carousel-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    transparent 100%
+  );
+}
+
+/* Estilos para los botones de navegación */
+.nav-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.nav-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilos para el scrollbar de las miniaturas */
+.thumbnail-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-track {
+  background: #2c1a12;
+  border-radius: 2px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb {
+  background: #774936;
+  border-radius: 2px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb:hover {
+  background: #5d3a2a;
+}
+
+/* Transiciones suaves para las miniaturas */
+.thumbnail-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.thumbnail-hover:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el contador de imágenes */
+.image-counter {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Estilos para el overlay de texto en las imágenes */
+.image-overlay {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    transparent 100%
+  );
+}
+
+/* Animación para el cambio de imágenes */
+.carousel-image {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos para los botones de navegación */
+.nav-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(8px);
+}
+
+.nav-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilos para el scrollbar de las miniaturas */
+.thumbnail-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb {
+  background: #1e3a8a;
+  border-radius: 2px;
+}
+
+.thumbnail-scroll::-webkit-scrollbar-thumb:hover {
+  background: #152858;
+}

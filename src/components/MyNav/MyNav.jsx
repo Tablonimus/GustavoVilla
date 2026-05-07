@@ -20,8 +20,9 @@ export default function MyNav() {
     { to: "/", text: "Inicio" },
     { to: "/bio", text: "Biografía" },
     { to: "/libros", text: "Libros" },
+    { to: "/blog", text: "Blog" },
+    { to: "/galeria", text: "Galería" },
     { to: "/reconocimientos", text: "Reconocimientos" },
-    // { to: "/galeria", text: "Galería" },
     { to: "/contacto", text: "Contacto" },
   ];
 
