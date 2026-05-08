@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { db, storage } from "../../firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export const useEvents = () => {

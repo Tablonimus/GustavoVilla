@@ -464,7 +464,7 @@ export default function AdminBooks() {
                onClick={() => { setActiveTab('events'); setView('list'); }}
              >
                <IconCamera />
-               {sidebarOpen && <span>Eventos</span>}
+               {sidebarOpen && <span>Galería</span>}
              </li>
              <li
                className={`px-6 py-4 cursor-pointer flex items-center gap-4 transition-colors ${activeTab === 'blog' ? 'bg-[#774936] border-l-4 border-white' : 'hover:bg-blue-800'}`}
@@ -493,7 +493,7 @@ export default function AdminBooks() {
                  activeTab === 'recognitions' ? "Gestión de Reconocimientos" :
                  activeTab === 'comments' ? "Moderación de Comentarios" :
                  activeTab === 'banners' ? "Gestión de Banner Principal" :
-                 activeTab === 'events' ? "Gestión de Eventos" :
+                 activeTab === 'events' ? "Gestión de Galería" :
                  "Gestión del Blog"}
               </h1>
               <p className="text-gray-500">
