@@ -18,10 +18,11 @@ export default function Home() {
   const [submitMessage, setSubmitMessage] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const heroRef = useRef(null);
-  const nameRef = useRef(null);
+  const parallaxRef = useRef(null);
   const locationRef = useRef(null);
   const messageRef = useRef(null);
   const scrollRef = useRef(null);
+  const nameRef = useRef(null);
 
   // --- Pre-cargador de imágenes críticas ---
   useEffect(() => {
@@ -101,8 +102,8 @@ export default function Home() {
       const y = (clientY / offsetHeight - 0.5) * 2;
 
       // Aplica el transform con diferente intensidad para crear profundidad
-      if (nameRef.current) {
-        nameRef.current.style.transform = `translate(${x * -15}px, ${
+      if (parallaxRef.current) {
+        parallaxRef.current.style.transform = `translate(${x * -15}px, ${
           y * -10
         }px)`;
       }
@@ -294,7 +295,7 @@ export default function Home() {
         {/* Elementos Flotantes (Parallax) */}
         <div className="relative z-10 w-full max-w-5xl lg:mx-56 flex flex-col items-center justify-center h-full pb-20">
           {/* Texto Principal (Centrado) */}
-          <div ref={nameRef} className="text-start w-full px-6 drop-shadow-lg">
+          <div ref={parallaxRef} className="text-start w-full px-6 drop-shadow-lg">
             <h2 className="text-blue-300 font-bold tracking-[0.2em] uppercase text-base md:text-lg mb-6">
               Escritor &middot; Historiador &middot; Docente
             </h2>
@@ -309,20 +310,18 @@ export default function Home() {
               “Historias que unen memoria, <br /> identidad y emoción.”
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link to={"/libros"}>
-                  <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
-                    Conocé mis libros
-                  </button>
-                </Link>
-                <Link to={"/blog"}>
-                  <button className="bg-[#774936] text-white px-8 py-3 rounded-sm hover:bg-[#5d3a2a] transition shadow-lg uppercase text-sm tracking-wider">
-                    Lee mi blog
-                  </button>
-                </Link>
-              </div>
+              <Link to={"/libros"}>
+                <button className="bg-[#1e3a8a] text-white px-8 py-3 rounded-sm hover:bg-[#152858] transition shadow-lg uppercase text-sm tracking-wider">
+                  Conocé mis libros
+                </button>
+              </Link>
+              <Link to={"/blog"}>
+                <button className="bg-[#774936] text-white px-8 py-3 rounded-sm hover:bg-[#5d3a2a] transition shadow-lg uppercase text-sm tracking-wider">
+                  Lee mi blog
+                </button>
+              </Link>
               <Link to={"/contacto"}>
-                <button className="border-2 border-white text-white px-8 py-3 rounded-sm hover:bg-white hover:text-[#1e3a8a] transition shadow-lg uppercase text-sm tracking-wider">
+                <button className="bg-white text-[#1e3a8a] px-8 py-3 rounded-sm hover:bg-[#1e3a8a] hover:text-white transition shadow-lg uppercase text-sm tracking-wider">
                   Contacto
                 </button>
               </Link>

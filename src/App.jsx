@@ -1,4 +1,5 @@
 import "./App.css";
+import "./screens/Home/homeStyles.css";
 import { BrowserRouter, Route, Routes, Outlet } from "react-router-dom";
 import Home from "./screens/Home/Home";
 import MyNav from "./components/MyNav/MyNav";
@@ -11,6 +12,7 @@ import Gallery from "./components/Gallery/Gallery";
 import Blog from "./components/Blog/Blog";
 import BlogPost from "./components/Blog/BlogPost";
 import Contacto from "./components/Contact/Contact";
+import ScrollToTop from "./components/ScrollToTop";
 import AdminBooks from "./screens/Admin/Dashboard";
 import Recognitions from "./components/Recognitions/Recognitions";
 
@@ -25,6 +27,7 @@ const PublicLayout = () => (
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Rutas Públicas (con Nav y Footer) */}
         <Route element={<PublicLayout />}>

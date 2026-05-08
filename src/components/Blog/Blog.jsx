@@ -34,7 +34,7 @@ export default function Blog() {
   }, []);
 
   const categories = [
-    { value: "todos", label: "Todas las entradas" },
+    { value: "todos", label: "Todas las notas" },
     { value: "reflexiones", label: "Reflexiones" },
     { value: "literatura", label: "Literatura" },
     { value: "escritura", label: "Escritura" },
@@ -66,7 +66,7 @@ export default function Blog() {
         <meta property="og:url" content="https://gustavovilla.com/blog" />
       </Helmet>
 
-      <div className="min-h-screen bg-[#fdfbf7]">
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
         {/* Header */}
         <section className="bg-[#774936] pt-16 pb-20 px-6 lg:px-32 text-white shadow-2xl">
           <div className="max-w-4xl mx-auto text-center">
@@ -100,12 +100,12 @@ export default function Blog() {
           </div>
         </div>
 
-        {/* Lista de entradas del blog */}
+        {/* Lista de notas del blog */}
         <div className="max-w-6xl mx-auto px-6 lg:px-32 pb-20">
           {filteredPosts.length === 0 ? (
             <div className="text-center py-16">
               <h2 className={`text-3xl text-[#1e3a8a] mb-4 ${cursiveFont}`}>
-                {selectedCategory === "todos" ? "No hay entradas" : `No hay entradas en ${categories.find(c => c.value === selectedCategory)?.label.toLowerCase()}`}
+                {selectedCategory === "todos" ? "No hay notas" : `No hay notas en ${categories.find(c => c.value === selectedCategory)?.label.toLowerCase()}`}
               </h2>
               <p className={`text-lg text-[#774936] ${bodyFont}`}>
                 {selectedCategory === "todos" ? "Próximamente nuevas reflexiones." : "Selecciona otra categoría para ver más contenido."}

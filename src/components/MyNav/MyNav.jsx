@@ -17,11 +17,11 @@ export default function MyNav() {
   }, []);
 
   const navLinks = [
-    { to: "/", text: "Inicio" },
-    { to: "/bio", text: "Biografía" },
+    // { to: "/", text: "Inicio" },
     { to: "/libros", text: "Libros" },
     { to: "/blog", text: "Blog" },
     { to: "/galeria", text: "Galería" },
+    { to: "/bio", text: "Biografía" },
     { to: "/reconocimientos", text: "Reconocimientos" },
     { to: "/contacto", text: "Contacto" },
   ];

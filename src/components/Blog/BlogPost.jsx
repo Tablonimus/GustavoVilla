@@ -80,7 +80,7 @@ export default function BlogPost() {
         <meta property="article:published_time" content={post.createdAt?.toDate?.().toISOString()} />
       </Helmet>
 
-      <div className="min-h-screen bg-[#fdfbf7]">
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
         {/* Header */}
         <section className="bg-[#774936] pt-16 pb-20 px-6 lg:px-32 text-white shadow-2xl">
           <div className="max-w-4xl mx-auto text-center">

@@ -1339,7 +1339,7 @@ export default function AdminBooks() {
           {activeTab === 'blog' && view === "list" && (
             <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
               {blogLoading ? (
-                <div className="p-12 text-center text-gray-500">Cargando entradas del blog...</div>
+                <div className="p-12 text-center text-gray-500">Cargando notas del blog...</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -1390,7 +1390,7 @@ export default function AdminBooks() {
                       {blogPosts.length === 0 && (
                         <tr>
                           <td colSpan="5" className="p-8 text-center text-gray-500">
-                            No hay entradas del blog. ¡Crea la primera!
+                            No hay notas del blog. ¡Crea la primera!
                           </td>
                         </tr>
                       )}

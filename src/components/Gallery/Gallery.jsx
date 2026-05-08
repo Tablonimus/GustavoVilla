@@ -94,7 +94,7 @@ export default function Gallery() {
         <meta property="og:url" content="https://gustavovilla.com/galeria" />
       </Helmet>
 
-      <div className="min-h-screen bg-[#fdfbf7]">
+      <div className="min-h-screen bg-[#fdfbf7] animate-fade-in">
         {/* Header */}
         <section className="bg-[#774936] mt-16 pt-16 pb-20 px-6 lg:px-32 text-white shadow-2xl relative z-10">
           <div className="max-w-4xl mx-auto text-center">
