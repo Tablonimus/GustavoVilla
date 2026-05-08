@@ -100,7 +100,7 @@ export default function PdfViewer() {
               <div className="ml-8">
                 <button
                   onClick={() => navigate(`/libros/${id}`)}
-                  className="bg-[#1e3a8a] text-white px-6 py-3 rounded hover:bg-[#152858] transition whitespace-nowrap"
+                  className="bg-[#1e3a8a] text-white px-6 py-3 rounded-full hover:bg-[#152858] hover:scale-105 transition duration-300 uppercase font-bold tracking-wider whitespace-nowrap"
                 >
                   ← Volver al libro
                 </button>
@@ -136,11 +136,33 @@ export default function PdfViewer() {
                   href={book.pdf_fragment}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#774936] text-white px-4 py-2 rounded hover:bg-[#5d3a2a] transition text-sm whitespace-nowrap"
+                  className="bg-[#774936] text-white px-4 py-2 rounded-full hover:bg-[#5d3a2a] hover:scale-105 transition duration-300 uppercase font-bold tracking-wider text-sm whitespace-nowrap"
                 >
                   📥 Descargar PDF
                 </a>
               </div>
+            </div>
+
+            {/* Call to Action - Solicitar Ejemplar */}
+            <div className="mt-8 bg-[#f8f4f0] p-8 rounded-lg border-2 border-[#774936]/20 text-center">
+              <h3 className={`text-2xl text-[#774936] mb-4 ${cursiveFont}`}>
+                ¿Te gustó este fragmento?
+              </h3>
+              <p className={`text-lg text-[#2c1a12] leading-relaxed mb-6 ${bodyFont}`}>
+                Espero que hayas disfrutado leyendo este pedazo de mi obra. Si te interesa leer el libro completo,
+                puedes solicitar un ejemplar poniéndote en contacto conmigo.
+              </p>
+              <a
+                href="https://wa.me/5491234567890?text=Hola%20Gustavo,%20le%C3%AD%20el%20fragmento%20de%20tu%20libro%20y%20me%20gustar%C3%ADa%20solicitar%20un%20ejemplar%20completo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-3 bg-[#25D366] text-white px-8 py-4 rounded-full shadow-lg hover:bg-[#20bd5a] hover:scale-105 transition duration-300 uppercase font-bold tracking-wider"
+              >
+                📱 Solicitar Ejemplar por WhatsApp
+              </a>
+              <p className={`text-sm text-gray-600 mt-4 ${bodyFont}`}>
+                Respondo lo antes posible para coordinar la entrega.
+              </p>
             </div>
           </div>
         </div>
